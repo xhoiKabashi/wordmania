@@ -58,150 +58,357 @@
       id: 1,
       category: 'Shqipëria & Kombi 🇦🇱',
       letters: ['S', 'H', 'Q', 'I', 'P', 'Ë', 'R', 'I', 'A'],
-      words: ['ARI', 'ERA', 'QEPA', 'HAPI', 'PARË', 'PASHË', 'PESHQ', 'SHQIP', 'SHQIPËRIA'],
-      golden: 'SHQIPËRIA',
-      bomb: 'PESHQ',
+      words: [
+        'SHI', 'ARI', 'ERA', 'HAPI', 'PARË', 'PASHË', 'PESHQ', 'SHQIP',
+        'QEPA', 'SQEP', 'QIRI', 'PRES', 'QESH', 'SHQIPE', 'QERSHI', 'QERSHIA',
+        'SHQIPËRIA'
+      ],
+      goldens: ['SHQIPËRIA', 'QERSHIA', 'SHQIPE', 'QERSHI'],
       bonus: [
-        'SHQIPËRI', 'ARË', 'QARË', 'SHARË', 'QIRA', 'HIRI', 'PRISH', 'PRISHA',
-        'PESHQI', 'PIQ', 'QEP', 'PËR', 'HAP', 'SHERI', 'SHER', 'HERA',
-        'PISHË', 'PISHA', 'SHIRA'
+        'ARË', 'QARË', 'QIRA', 'HIRI', 'PRISH', 'PRISHA', 'PIQ', 'QEP',
+        'PËR', 'HAP', 'HERA', 'PISHË', 'PISHA', 'RASHË', 'QESHA', 'SQEPI',
+        'SQEPAR', 'SHIRA', 'HIR', 'PAS'
       ]
     },
     {
       id: 2,
       category: 'Deti & Riviera (Ksamil) 🌊',
       letters: ['D', 'E', 'T', 'I', 'V', 'A', 'L', 'Ë', 'R'],
-      words: ['DET', 'VALË', 'DITA', 'VERA', 'LART', 'DRITË', 'VLERA', 'TREVA', 'VATËR'],
-      golden: 'VLERA',
-      bomb: 'DRITË',
+      words: [
+        'DET', 'ARI', 'ART', 'ERË', 'VIT', 'DITA', 'VERA', 'VALË',
+        'VELA', 'LART', 'VITE', 'TRE', 'DRITË', 'LETRA', 'VILA',
+        'TËRË', 'VETË', 'VLERAT', 'LIDERË', 'DETARI'
+      ],
+      goldens: ['DETARI', 'DRITË', 'VLERAT', 'LETRA'],
       bonus: [
-        'DETI', 'ERË', 'ERA', 'DALË', 'DITË', 'DERI', 'LIRË', 'LIRA',
-        'VELA', 'VETË', 'VERË', 'RETË', 'AVLI', 'LETRA', 'DRITA', 'TELA', 'LËRË'
+        'DETAR', 'DETI', 'DRITA', 'DITË', 'VERË', 'VLERA', 'VLERË', 'LETËR',
+        'TELA', 'TELË', 'TELI', 'TAVË', 'DERË', 'DERA',
+        'DELE', 'DELET', 'DATË', 'DIETA', 'LIDER', 'IDE', 'IDEAL', 'ELITË',
+        'LIRA', 'LIRË', 'VATËR', 'TREVA', 'LARTË', 'TRI', 'ARË',
+        'ARTË', 'ARTI', 'VILË', 'VILAT', 'VELAT', 'ATI', 'DITAR', 'DELTA',
+        'TREVË'
       ]
     },
     {
       id: 3,
       category: 'Sofra & Ushqimi Shqiptar 🥧',
       letters: ['B', 'U', 'K', 'Ë', 'R', 'Y', 'E', 'T', 'A'],
-      words: ['URË', 'BUKË', 'BUTË', 'URTË', 'TUBË', 'KRYE', 'BËRË', 'BYREK', 'BYREKU'],
-      golden: 'BYREKU',
-      bomb: 'KRYE',
+      words: [
+        'BUKË', 'URË', 'BUTË', 'URTË', 'TUBË', 'KRYE', 'BËRË', 'BYREK',
+        'BUKA', 'KAT', 'KATËR', 'BAR', 'BARK', 'TRU', 'TRE', 'ERË',
+        'ARË', 'KUR', 'BAKËR', 'KRYET', 'TYRE', 'TËRË', 'BYREKU'
+      ],
+      goldens: ['BYREKU', 'BYREK', 'BUKË', 'KATËR'],
       bonus: [
-        'BUKA', 'BUTA', 'URTA', 'KRYET', 'KREU', 'BREU', 'BËRA', 'TËRË',
-        'BARË', 'BART', 'TYRE', 'ARË', 'ERË', 'KUB', 'KUBË', 'KURË',
-        'KURA', 'KATE', 'URËT'
+        'URA', 'URAT', 'TUBA', 'BËRA', 'KATE', 'BARKU', 'ERA',
+        'ART', 'KURË', 'KURA', 'KURAT', 'TEK', 'KUB', 'KËTU', 'KËTË',
+        'KËTA', 'ATË', 'ATY', 'TEKA'
       ]
     },
     {
       id: 4,
       category: 'Muzika & Festa 🎶',
       letters: ['K', 'Ë', 'N', 'G', 'A', 'V', 'L', 'L', 'E'],
-      words: ['LEK', 'LËNG', 'KALË', 'KALL', 'VLEN', 'KËNGË', 'KËNGA', 'VËLLA', 'VALLE'],
-      golden: 'VALLE',
-      bomb: 'KËNGË',
-      bonus: [
-        'VËNË', 'LËNË', 'LAG', 'LAGË', 'LEN', 'NGA', 'VALË', 'LEKA',
-        'KALLË', 'GEN'
-      ]
+      words: [
+        'LEK', 'KALË', 'VLEN', 'KËNGË', 'KËNGA', 'VËLLA', 'VALLE',
+        'LËNG', 'LALE', 'KANË', 'VELA', 'VALË', 'LEVË', 'LEGEN', 'NGEL',
+        'NGA', 'LAG', 'VËNË', 'LËNË', 'VELË',
+        'NGELA', 'LEKË'
+      ],
+      goldens: ['VALLE', 'KËNGË', 'KËNGA', 'VËLLA'],
+      bonus: ['VEGËL', 'VEGLA', 'LAVË']
     },
     {
       id: 5,
       category: 'Familja & Zemra ❤️',
       letters: ['Z', 'E', 'M', 'Ë', 'R', 'N', 'A', 'T', 'D'],
-      words: ['NATË', 'DERË', 'MEND', 'NDER', 'EMËR', 'ZEMËR', 'ZEMRA', 'EMRAT', 'ZEMRAT'],
-      golden: 'ZEMRAT',
-      bomb: 'NDER',
+      words: [
+        'NATË', 'DERË', 'MEND', 'NDER', 'EMËR', 'ZEMËR', 'ZEMRA', 'EMRAT',
+        'ZEMRAT', 'ARTË', 'DERA', 'NETË', 'ERË', 'ARMË', 'DËM', 'TËRË',
+        'DERAZË', 'MËZ', 'MARTË', 'DRE', 'DET', 'ZËRA'
+      ],
+      goldens: ['ZEMRAT', 'ZEMRA', 'ZEMËR', 'DERAZË'],
       bonus: [
-        'ARTË', 'ZËRA', 'EMRA', 'DERA', 'NETË', 'ERË', 'ARMË', 'DËM',
-        'DREN', 'NDARË', 'TËRË', 'NDERA', 'MENDË'
+        'ZËRAT', 'DËMET', 'MËZA', 'MËZAT', 'ZAR', 'MEZE',
+        'MEZET', 'MAT', 'NDARË', 'ARË', 'ART', 'ZËNË', 'ATË'
       ]
     },
     {
       id: 6,
       category: 'Qytetet & Trojet 🏙️',
       letters: ['T', 'I', 'R', 'A', 'N', 'A', 'K', 'O', 'V'],
-      words: ['ORA', 'KOT', 'TOKA', 'VOTA', 'NATA', 'VORA', 'VAKT', 'ORTAK', 'TIRANA'],
-      golden: 'TIRANA',
-      bomb: 'ORTAK',
+      words: [
+        'ORA', 'TOKA', 'NATA', 'ARKA', 'VOTA', 'KOT', 'ORTAK', 'TRIO',
+        'AKTOR', 'KOVA', 'TON', 'NOTA', 'KINO', 'KROI', 'TANI', 'ATA',
+        'ATO', 'ATI', 'ARI', 'ART', 'TRI', 'TANK', 'KRONA', 'VATAN',
+        'RAKI', 'AVOKAT', 'NOTAR', 'KONTRA', 'KARTON', 'TIRANA'
+      ],
+      goldens: ['TIRANA', 'KARTON', 'AVOKAT', 'KRONA'],
       bonus: [
-        'ARKA', 'TONA', 'AKTOR', 'TRIO', 'VAKTI', 'KARTON', 'KORITA',
-        'TIRAN', 'TOK', 'KOTA', 'KOVA', 'TANK', 'KROAT'
+        'ARKAT', 'AKTORI', 'NOTARI', 'AVOKATI', 'KORITA', 'IKONA', 'IKONAT',
+        'KORI', 'KOVAT', 'ARTI', 'VATANI', 'RAKIA', 'KRONAT', 'ATAK'
       ]
     },
     {
       id: 7,
       category: 'Natyra & Alpet Shqiptare 🏔️',
       letters: ['M', 'A', 'L', 'I', 'F', 'U', 'S', 'H', 'Ë'],
-      words: ['MAL', 'SHI', 'MALI', 'LUMI', 'SHIU', 'FLAS', 'FUSHA', 'SHUMË', 'LASHË'],
-      golden: 'SHUMË',
-      bomb: 'FUSHA',
+      words: [
+        'MAL', 'SHI', 'MALI', 'LUMI', 'SHIU', 'FLAS', 'FUSHA', 'SHUMË',
+        'LASHË', 'LUMË', 'FUSHË', 'MISH', 'FILM', 'MALE', 'LIS', 'HUA',
+        'FASHË', 'MASË', 'SHUL', 'MALËSI', 'FIS', 'FISE', 'AFSH', 'MUA'
+      ],
+      goldens: ['MALËSI', 'FUSHË', 'FUSHA', 'SHUMË'],
       bonus: [
-        'LUM', 'LUMË', 'FUSHË', 'MISH', 'SHUMA', 'FILM', 'FILMA', 'AFSH',
-        'HALI', 'HALË', 'SHUL', 'MASË', 'FASHË', 'MUA', 'HUA',
-        'MIU', 'LIMA', 'LIMË'
+        'FILMA', 'LIMA', 'LIMË', 'HALI', 'SHUMA', 'MES', 'ISH', 'ISHA',
+        'LESH', 'LUS', 'HAS', 'FLE', 'MIU'
       ]
     },
     {
       id: 8,
       category: 'Sporti & Kampionët ⚽',
       letters: ['F', 'I', 'T', 'O', 'R', 'E', 'G', 'L', 'A'],
-      words: ['FAT', 'GOL', 'LIGA', 'GARË', 'GOLI', 'FORTË', 'GOLFI', 'GLORIA', 'FITORE'],
-      golden: 'FITORE',
-      bomb: 'FORTË',
+      words: [
+        'FAT', 'GOL', 'LIGA', 'GARË', 'GOLI', 'FORTË', 'GOLFI', 'GLORIA',
+        'LART', 'TIFO', 'GOLF', 'ART', 'ARTI', 'LOT', 'LOTI', 'FLET',
+        'FLORA', 'GATI', 'TREG', 'TRI', 'TRE',
+        'TROFE', 'GOTA', 'FOTEL', 'GOLAT', 'TRAG', 'FITORE'
+      ],
+      goldens: ['FITORE', 'GLORIA', 'FORTË', 'TROFE'],
       bonus: [
-        'FATI', 'LART', 'TIFO', 'FORT', 'FORTA', 'ORA', 'ORË',
-        'LIRË', 'LIRA', 'ROTA', 'TRIO', 'GOLF', 'ART', 'ARTI', 'FLET',
-        'FLETA', 'LOT', 'LOTI', 'GRA', 'FLORA'
+        'FLETA', 'FOTELI', 'FLE', 'FLI', 'GAFË',
+        'GOTË', 'LETRA', 'LIRË', 'LIRA', 'ORA', 'ORË', 'LAG'
       ]
     },
     {
       id: 9,
       category: 'Diaspora & Mërgimi ✈️',
       letters: ['M', 'Ë', 'R', 'G', 'I', 'M', 'T', 'A', 'R'],
-      words: ['RRI', 'TRIM', 'MAMI', 'MIRË', 'EMRI', 'TRIMA', 'MARRË', 'MËRGIM', 'MËRGIMTAR'],
-      golden: 'MËRGIMTAR',
-      bomb: 'MËRGIM',
-      bonus: [
-        'EMRA', 'RITËM', 'MARR', 'GËRMA', 'ART', 'ARTË', 'ARMË', 'MAT',
-        'MIT', 'GRAM', 'RRIMA', 'RRIMË', 'TIM', 'MIRA', 'MITË'
-      ]
+      words: [
+        'RRI', 'TRIM', 'MAMI', 'MIRË', 'EMRI', 'TRIMA', 'MARRË', 'MËRGIM',
+        'EMRA', 'GËRMA', 'ART', 'ARMË', 'MAT', 'MIT', 'GRAM', 'MIRA',
+        'RITËM', 'GRIMË', 'MARTIR', 'TREMA', 'RIMA', 'RIMË', 'MARTE',
+        'TREG', 'TRI', 'TRE', 'MARR', 'GËRMAT', 'GËRMIM', 'MARRIM',
+        'RRIT', 'MËRGIMTAR'
+      ],
+      goldens: ['MËRGIMTAR', 'MËRGIM', 'MARTIR', 'GËRMIM'],
+      bonus: ['ARTI', 'ARTË', 'RIMAT', 'GRIMA', 'EMRAT', 'MERITA']
     },
     {
       id: 10,
       category: 'Dashuria & Nata Romantike 💕',
       letters: ['D', 'A', 'S', 'H', 'U', 'R', 'I', 'J', 'Ë'],
-      words: ['DUA', 'UJË', 'DRU', 'ERA', 'RUAJ', 'DUAJ', 'DASHI', 'SHUAJ', 'DASHURI'],
-      golden: 'DASHURI',
-      bomb: 'RUAJ',
+      words: [
+        'DUA', 'UJË', 'DRU', 'ERA', 'RUAJ', 'DUAJ', 'DASHI', 'SHUAJ',
+        'DASHUR', 'DHE', 'DHEU', 'DUAR', 'AJËR', 'AJRI', 'AUR', 'DIJE',
+        'DJE', 'RASHË', 'SHIJ', 'UJI', 'URË', 'URA', 'SHIU',
+        'SHI', 'HIR', 'DASH', 'ARI', 'ARË', 'DASHURI'
+      ],
+      goldens: ['DASHURI', 'DASHUR', 'DASHI', 'SHUAJ'],
       bonus: [
-        'UJI', 'URË', 'URA', 'SHIU', 'SHI', 'HIR', 'ARDHI', 'SHARË',
-        'SHIRA', 'DASH', 'ARI', 'ARË', 'JESH', 'DRUJA'
+        'DUSH', 'SHUAR', 'SAJ', 'ISHA', 'ISH', 'HUA',
+        'DHI', 'DHIA', 'AURI'
       ]
     },
     {
       id: 11,
       category: 'Kafe & Biseda (Blloku) ☕',
       letters: ['K', 'A', 'F', 'E', 'B', 'I', 'S', 'D', 'Ë'],
-      words: ['FIK', 'FIS', 'KAFE', 'BESA', 'SADE', 'SEFA', 'BIFE', 'SKEDË', 'BISEDË'],
-      golden: 'BISEDË',
-      bomb: 'BESA',
-      bonus: [
-        'BESË', 'FIKA', 'FIKE', 'FISE', 'DISK', 'DISKE', 'KADE', 'BIK',
-        'BIKA', 'FESA', 'FASE', 'DESI'
-      ]
+      words: [
+        'FIK', 'FIS', 'KAFE', 'BESA', 'SKEDË', 'BESË',
+        'FISE', 'DISK', 'DISKE', 'SKEDA', 'KADIFE', 'IDE', 'SAFI',
+        'BISEDA', 'SKI', 'BISEDË'
+      ],
+      goldens: ['BISEDË', 'BISEDA', 'KADIFE', 'SKEDË'],
+      bonus: ['BIS', 'BIDE', 'FAKS', 'FAKSI']
     },
     {
       id: 12,
       category: 'Pazari i Vjetër & Çarshia 🏮',
       letters: ['Ç', 'A', 'R', 'S', 'H', 'I', 'P', 'Ë', 'T'],
-      words: ['HAP', 'ÇAP', 'ÇATI', 'SHIT', 'PRIT', 'TRASH', 'SHPIRT', 'SHTËPI', 'TRASHË'],
-      golden: 'SHPIRT',
-      bomb: 'SHTËPI',
-      bonus: [
-        'ÇAR', 'ÇARË', 'ÇAPI', 'ÇIP', 'ÇEP', 'ÇEPI', 'SHPI', 'PRISH',
-        'PISHË', 'HAPI', 'PARË', 'PASHË', 'SHARË', 'SHITË', 'ART', 'ARTË',
-        'PRITA', 'ARË'
-      ]
+      words: [
+        'HAP', 'ÇATI', 'SHIT', 'PRIT', 'SHPIRT', 'SHTËPI', 'TRASHË', 'ÇARË',
+        'ÇIP', 'ÇEP', 'ÇEPI', 'PRISH', 'PISHË', 'HAPI', 'PARË', 'PASHË',
+        'ART', 'ARTË', 'PRITA', 'ARË', 'ÇARSHI', 'ÇAST', 'ÇASTI', 'ÇETA',
+        'TASH', 'TEH', 'TRE', 'TRI', 'PRA', 'PËR', 'PAS', 'HIC'
+      ],
+      goldens: ['SHPIRT', 'ÇARSHI', 'SHTËPI', 'TRASHË'],
+      bonus: ['SHI', 'SITË', 'SITA', 'PSE', 'ATË', 'ATI', 'ARI']
+    },
+    {
+      id: 13,
+      category: 'Shkolla & Libri 📚',
+      letters: ['L', 'I', 'B', 'Ë', 'R', 'S', 'H', 'K', 'A'],
+      words: [
+        'LIBËR', 'LIBRA', 'KLASË', 'KISHË', 'KISHA', 'SHKEL', 'SHKELA',
+        'BËRA', 'LIS', 'LESH', 'LEK', 'LARË', 'BARK',
+        'BAKËR', 'BAKRI', 'KALË', 'KALI', 'KRAH', 'KRAHË', 'HARK', 'ARKË',
+        'HIR', 'ISH', 'ISHA', 'RASHË', 'SHI', 'SHIRA', 'LIRA', 'LIRË',
+        'BAR', 'BARI', 'BIR', 'BIRË', 'BIRA', 'LËR', 'LËRI'
+      ],
+      goldens: ['LIBËR', 'LIBRA', 'KLASË', 'LIRË'],
+      bonus: []
+    },
+    {
+      id: 14,
+      category: 'Bujqësia & Kopshti 🌱',
+      letters: ['T', 'R', 'A', 'K', 'O', 'L', 'P', 'Ë', 'S'],
+      words: [
+        'TOKA', 'LOPA', 'LOPË', 'PELA', 'KOSA', 'KOSË', 'KOSAT',
+        'ARË', 'PËR', 'PRA', 'KALË', 'PRES', 'PREK', 'PREKA', 'PORT',
+        'PORTA', 'KARTË', 'KAROTË', 'KOT', 'KOS', 'KRAP', 'LAK', 'LAKËR',
+        'LARË', 'LEK', 'LOT', 'ORA', 'ORË', 'ORËT',
+        'PAK', 'PALË', 'PARË', 'PARK', 'PAS', 'POR', 'SAPË', 'SOT',
+        'SPORT', 'SPORTE', 'STOK', 'STOP', 'TAPË', 'TEK', 'TOP', 'TOPA', 'TRE'
+      ],
+      goldens: ['KAROTË', 'LAKËR', 'PORTA', 'KOSAT'],
+      bonus: []
+    },
+    {
+      id: 15,
+      category: 'Udhëtimi & Transporti ✈️',
+      letters: ['A', 'V', 'I', 'O', 'N', 'T', 'R', 'E', 'S'],
+      words: [
+        'AVION', 'TREN', 'TRENI', 'VIT', 'VITE', 'VERA', 'VOTA', 'NOTA',
+        'NOTARI', 'NIS', 'NISA', 'SOT', 'TANI', 'TON', 'TONI', 'TRI',
+        'TRIO', 'TRON', 'TRONI', 'TRE', 'ORA', 'OSE', 'ARI', 'ART',
+        'ARTI', 'ATI', 'ATO', 'SITA', 'TIRAN', 'RAST', 'RASTI'
+      ],
+      goldens: ['AVION', 'TREN', 'TRENI', 'NOTARI'],
+      bonus: []
+    },
+    {
+      id: 16,
+      category: 'Puna & Zanati 🛠️',
+      letters: ['A', 'K', 'N', 'O', 'P', 'R', 'T', 'U', 'Ë'],
+      words: [
+        'PUNË', 'PUNA', 'PUNËTOR', 'PËR', 'POR', 'PORTA', 'PORT', 'PARK',
+        'PARKU', 'PAK', 'PANË', 'PARË', 'PRA', 'PREK', 'PREKA',
+        'PRET', 'TAPË', 'TEK', 'TOKA', 'TOP', 'TOPA', 'TRE',
+        'TREN', 'TRON', 'TURP', 'KUR', 'KURA', 'KURAT', 'KURË', 'KAT',
+        'KATE', 'KATËR', 'KARTË', 'KAROTË', 'KANË', 'KAP', 'KOT', 'KRAP',
+        'NATË', 'NUK', 'TON', 'URA', 'URË', 'URAT', 'URTË', 'AUR',
+        'ART', 'ARTË', 'ARË', 'ATË', 'ATO', 'ANË', 'ANËT', 'AUTO', 'AUTOR'
+      ],
+      goldens: ['PUNËTOR', 'PUNË', 'AUTOR', 'PORTA'],
+      bonus: []
+    },
+    {
+      id: 17,
+      category: 'Lojërat & Argëtimi 🎲',
+      letters: ['L', 'O', 'J', 'Ë', 'R', 'A', 'T', 'I', 'M'],
+      words: [
+        'LOJË', 'LOJA', 'LOJRA', 'LOJRAT', 'LOJTAR', 'LOJTARI', 'LOJTARE',
+        'MARTE', 'MIRA', 'MIRË', 'MIRAT',
+        'MIT', 'MOT', 'MOTI', 'MOTRA', 'MOTËR', 'MOLA', 'MOLË', 'MOLAT',
+        'LOT', 'LOTI', 'LARË', 'LART', 'LARTË', 'LIRA', 'LIRË',
+        'LETRA', 'RIMA', 'RIMË', 'RIMAT', 'RITËM', 'ROJA', 'ROJË', 'ROJAT',
+        'TEMA', 'TREMA', 'TRI', 'TRIO', 'TRIM', 'TRIMA',
+        'METRO', 'METRA', 'METRI', 'MAT', 'TRE', 'ORA', 'ORË', 'ORËT',
+        'AJËR', 'AJRI', 'JETA', 'ARI', 'ART', 'ARTI', 'ARË', 'ATË', 'ATI',
+        'ATO', 'MOJ'
+      ],
+      goldens: ['LOJTARI', 'LOJTAR', 'LOJRA', 'LOJË'],
+      bonus: []
+    },
+    {
+      id: 18,
+      category: 'Shtëpia & Banesa 🏠',
+      letters: ['S', 'H', 'T', 'Ë', 'P', 'I', 'A', 'D', 'R'],
+      words: [
+        'SHTËPI', 'SHTËPIA', 'SHPIRT', 'SHPAT', 'STREHA',
+        'TAPË', 'TESHA', 'HARTË', 'HERA', 'DERA',
+        'DITA', 'DITË', 'DET', 'DETI', 'DHE', 'HAP', 'HAPI', 'HIR', 'HAS',
+        'HASI', 'PËR', 'PARË', 'PAS', 'PASHË', 'PATË', 'PISHA', 'PISHË',
+        'PRA', 'PRES', 'PRET', 'PRITA', 'PRISH', 'PRISHA', 'RASHË', 'SHI',
+        'SHIRA', 'SHIT', 'SITA', 'TEH', 'TRE', 'TRI', 'DRE'
+      ],
+      goldens: ['SHTËPIA', 'SHTËPI', 'STREHA', 'TESHA'],
+      bonus: []
+    },
+    {
+      id: 19,
+      category: 'Rrobat & Moda 👗',
+      letters: ['R', 'R', 'O', 'B', 'A', 'T', 'Ë', 'S', 'H'],
+      words: [
+        'RROBA', 'RROBAT', 'RROBË', 'ROBA', 'ROBË', 'ROBAT', 'RROTA',
+        'RROTË', 'RRETH', 'RRAH', 'RAST', 'ROSA', 'ROSË', 'ROSAT',
+        'HERA', 'HARTË', 'HAS', 'BART', 'BESA', 'BESAT',
+        'BËRA', 'BOTA', 'BOTË', 'BORA', 'BORË', 'BOSH',
+        'BROSH', 'BROSHË', 'BROSHA', 'TERR', 'TESHA', 'TRE'
+      ],
+      goldens: ['RROBAT', 'BROSHË', 'RROBA', 'TESHA'],
+      bonus: []
+    },
+    {
+      id: 20,
+      category: 'Kafshët & Fshati 🐄',
+      letters: ['K', 'A', 'F', 'S', 'H', 'Ë', 'T', 'I', 'R'],
+      words: [
+        'KAFSHË', 'KAFSHËT', 'FSHAT', 'FSHATI', 'FIK', 'FIS', 'FISE', 'FISET',
+        'FAT', 'FATI', 'FARË', 'FASHË', 'FAKS', 'FAKSI', 'FRIK', 'FRIKA',
+        'HARK', 'HARTË', 'HAS', 'HASI', 'HAK', 'HIR', 'HIT',
+        'HEKTAR', 'KAFE', 'KARTË', 'KAT', 'KATE', 'KATËR', 'KATI', 'KISHA',
+        'KISHË', 'KITAR', 'KITARË', 'KRAH', 'KRAHË', 'KRIS', 'RAKI',
+        'RASHË', 'SHEF', 'SHEFI', 'SHI', 'SHIRA', 'SHIT', 'SITA', 'TEH',
+        'TEK', 'TRE', 'TRI'
+      ],
+      goldens: ['KAFSHËT', 'KAFSHË', 'FSHATI', 'FSHAT'],
+      bonus: []
+    },
+    {
+      id: 21,
+      category: 'Kinema & Filmat 🎬',
+      letters: ['F', 'I', 'L', 'M', 'A', 'S', 'H', 'Ë', 'T'],
+      words: [
+        'FILM', 'FILMA', 'FILMAT', 'FLAS', 'FLET', 'FLETA', 'FLE',
+        'FLI', 'FAT', 'FATI', 'FAL', 'FALS', 'FIS', 'FISE', 'FISET', 'HELM',
+        'HIT', 'HAS', 'HASI', 'LEH', 'LESH', 'LIMA', 'LIMË', 'LIS',
+        'MAL', 'MALI', 'MALE', 'MASË', 'MAT', 'MISH', 'MIT', 'SHEF', 'SHEFI',
+        'SHI', 'SHIT', 'SITA', 'STIL', 'TEMA', 'TEH'
+      ],
+      goldens: ['FILMAT', 'FILMA', 'STIL', 'TEMA'],
+      bonus: []
+    },
+    {
+      id: 22,
+      category: 'Festat & Traditat 🎉',
+      letters: ['F', 'E', 'S', 'T', 'I', 'V', 'A', 'L', 'Ë'],
+      words: [
+        'FESTIVAL', 'FESTË', 'FESTA', 'FAT', 'FATI', 'FAL', 'FALS', 'FIS',
+        'FISE', 'FISET', 'FLE', 'FLET', 'FLETA', 'FLETË', 'FLI', 'FLAS',
+        'LIS', 'SITA', 'SITË', 'STIL', 'TAVË', 'VALË', 'VELA', 'VELË',
+        'VELAT', 'VESË', 'VESA', 'VETË', 'VILA', 'VILË', 'VILAT', 'VIT',
+        'VITE', 'FETA', 'FETË'
+      ],
+      goldens: ['FESTIVAL', 'FESTË', 'FESTA', 'FLETË'],
+      bonus: []
+    },
+    {
+      id: 23,
+      category: 'Lulet & Bimët 🌸',
+      letters: ['L', 'U', 'L', 'E', 'T', 'Ë', 'R', 'I', 'A'],
+      words: [
+        'LULË', 'LULET', 'TULLË', 'TELA', 'TELË', 'TELI',
+        'TEL', 'TËRË', 'TRU', 'URA', 'URË', 'URAT', 'URTË', 'LARË', 'LART',
+        'LARTË', 'LETËR', 'LETRA', 'LIRA', 'LIRË', 'ARI', 'ART', 'ARTI',
+        'ARTË', 'ARË', 'ATË', 'ATI', 'AUR', 'AURI', 'RALI', 'TRE', 'TRI',
+        'LËR', 'LËRI'
+      ],
+      goldens: ['LULET', 'LULË', 'TULLË', 'LETËR'],
+      bonus: []
+    },
+    {
+      id: 24,
+      category: 'Bora & Dimri ❄️',
+      letters: ['D', 'Ë', 'B', 'O', 'R', 'Ë', 'S', 'H', 'I'],
+      words: [
+        'DËBORË', 'DËSHIRË', 'BORË', 'SHI', 'ERË', 'ORË', 'DORË',
+        'ROSË', 'BRODË', 'ISH', 'HIR',
+        'BOSH', 'HERË', 'DHE', 'DHI'
+      ],
+      goldens: ['DËBORË', 'DËSHIRË', 'BORË', 'BRODË'],
+      bonus: []
     }
   ];
 
@@ -268,6 +475,52 @@
     { user: 'gentian_lezh', team: 'shkodra' }
   ];
 
+  // Gift menu: one entry per interaction, with aliases so raw TikTok gift
+  // names forwarded by a bridge are mapped automatically (server + client).
+  const GIFTS = [
+    {
+      id: 'theme',
+      emoji: '🌹',
+      name: 'Rozë',
+      effect: 'Ndryshon ngjyrat e lojës',
+      points: 30,
+      aliases: ['rose', 'roze', 'ngjyr', 'color', 'background']
+    },
+    {
+      id: 'song',
+      emoji: '🎵',
+      name: 'TikTok',
+      effect: 'Ndryshon këngën e lojës',
+      points: 50,
+      aliases: ['tiktok', 'music', 'song', 'keng', 'kenge']
+    },
+    {
+      id: 'hint',
+      emoji: '⚡',
+      name: 'Rrufe',
+      effect: 'Zbulon 2 shkronja të fshehura',
+      points: 60,
+      aliases: ['finger', 'heart', 'donut', 'ice', 'lightning', 'hint', 'rrufe', 'zemer']
+    },
+    {
+      id: 'eagle',
+      emoji: '🦅',
+      name: 'Shqiponjë',
+      effect: '3X pikë VIP 45s + 1 fjalë',
+      points: 200,
+      aliases: ['eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj', 'elephant']
+    }
+  ];
+
+  const TIPS = [
+    ['💬', 'SHKRUAJ FJALËN NË KOMENT'],
+    ['👑', 'GJEJ FJALËN E ARTË · 3X PK'],
+    ['❤️', '200+ LIKES = 1 SHKRONJË'],
+    ['🎁', 'DHURATA = HINT & 3X VIP'],
+    ['⚡', 'FJALË BONUS = +25 PK'],
+    ['🏆', 'TOP 3 FITOJNË ÇDO RAUND']
+  ];
+
   global.ALBANIAN_DATA = {
     normalizeAlbanian,
     canFormWord,
@@ -275,6 +528,8 @@
     THEMES,
     SONGS,
     ROUNDS,
-    VIEWERS_POOL
+    VIEWERS_POOL,
+    GIFTS,
+    TIPS
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -89,6 +89,13 @@
       this.currentSong = 0;
       this.step = 0;
       this.timerId = null;
+      this.playlist = [];
+      this.trackIndex = 0;
+      this.players = [null, null];
+      this.activePlayer = 0;
+      this.fadeTimer = null;
+      this.volume = 0.55;
+      this.onTrackChange = null;
     }
 
     ensureContext() {
@@ -101,7 +108,7 @@
         this.masterGain.connect(this.ctx.destination);
 
         this.musicGain = this.ctx.createGain();
-        this.musicGain.gain.value = 0.28;
+        this.musicGain.gain.value = this.volume * 0.5;
         this.musicGain.connect(this.masterGain);
 
         this.sfxGain = this.ctx.createGain();
@@ -135,6 +142,9 @@
       if (this.masterGain && this.ctx) {
         this.masterGain.gain.setTargetAtTime(this.muted ? 0 : 0.75, this.ctx.currentTime, 0.03);
       }
+      for (const player of this.players) {
+        if (player) player.muted = this.muted;
+      }
       return this.muted;
     }
 
@@ -143,17 +153,168 @@
     }
 
     getCurrentSong() {
+      if (this.playlist.length) {
+        return this.playlist[this.trackIndex] || this.playlist[0];
+      }
       return SONGS[this.currentSong] || SONGS[0];
+    }
+
+    emitTrack() {
+      if (typeof this.onTrackChange === 'function') {
+        try {
+          this.onTrackChange(this.getCurrentSong());
+        } catch {
+          /* ignore UI callback errors */
+        }
+      }
+    }
+
+    ensureAudioPlayer(index) {
+      let player = this.players[index];
+      if (!player) {
+        player = new global.Audio();
+        player.preload = 'auto';
+        player.addEventListener('ended', () => {
+          if (index === this.activePlayer && this.musicEnabled && this.playlist.length) {
+            this.nextSong();
+          }
+        });
+        this.players[index] = player;
+      }
+      return player;
+    }
+
+    setPlaylist(tracks) {
+      const list = Array.isArray(tracks)
+        ? tracks.filter((t) => t && typeof t.name === 'string' && typeof t.url === 'string')
+        : [];
+
+      // shuffle once per session so a 5-hour stream doesn't loop alphabetically
+      for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+      }
+
+      this.playlist = list;
+      this.trackIndex = 0;
+
+      if (this.timerId) {
+        clearInterval(this.timerId);
+        this.timerId = null;
+      }
+      if (!list.length) {
+        if (this.musicEnabled) this.restartScheduler();
+        return;
+      }
+      if (this.musicEnabled) this.playTrack(0);
+      else this.emitTrack();
+    }
+
+    playTrack(index) {
+      if (!this.playlist.length) return null;
+      const len = this.playlist.length;
+      this.trackIndex = ((Math.floor(index) % len) + len) % len;
+      const track = this.playlist[this.trackIndex];
+      const nextSlot = 1 - this.activePlayer;
+      const next = this.ensureAudioPlayer(nextSlot);
+      const prev = this.players[this.activePlayer];
+
+      clearInterval(this.fadeTimer);
+      this.fadeTimer = null;
+
+      try {
+        next.pause();
+        next.src = track.url;
+        next.load();
+        next.volume = 0;
+        next.muted = this.muted;
+        const played = next.play();
+        if (played && typeof played.catch === 'function') played.catch(() => {});
+      } catch {
+        /* ignore autoplay errors */
+      }
+
+      this.activePlayer = nextSlot;
+      const fadePrev = prev && prev !== next && !prev.paused ? prev : null;
+      const steps = 22;
+      let step = 0;
+
+      this.fadeTimer = setInterval(() => {
+        step += 1;
+        const t = Math.min(1, step / steps);
+        try {
+          next.volume = Math.max(0, Math.min(1, this.volume * t));
+        } catch {}
+        if (fadePrev) {
+          try {
+            fadePrev.volume = Math.max(0, Math.min(1, this.volume * (1 - t)));
+          } catch {}
+        }
+        if (t >= 1) {
+          clearInterval(this.fadeTimer);
+          this.fadeTimer = null;
+          if (fadePrev) {
+            try {
+              fadePrev.pause();
+              fadePrev.removeAttribute('src');
+              fadePrev.load();
+            } catch {}
+          }
+        }
+      }, 40);
+
+      this.emitTrack();
+      return track;
+    }
+
+    stopPlaylist() {
+      clearInterval(this.fadeTimer);
+      this.fadeTimer = null;
+      for (const player of this.players) {
+        if (!player) continue;
+        try {
+          player.pause();
+          player.removeAttribute('src');
+          player.load();
+        } catch {}
+      }
+    }
+
+    setMusicVolume(value) {
+      const volume = Math.max(0, Math.min(1, Number(value) || 0));
+      this.volume = volume;
+      if (this.musicGain && this.ctx) {
+        this.musicGain.gain.setTargetAtTime(volume * 0.5, this.ctx.currentTime, 0.03);
+      }
+      for (const player of this.players) {
+        if (!player) continue;
+        try {
+          player.volume = volume;
+        } catch {}
+      }
+      return volume;
+    }
+
+    getMusicVolume() {
+      return this.volume;
     }
 
     startMusic() {
       this.ensureContext();
       this.musicEnabled = true;
+      if (this.playlist.length) {
+        this.playTrack(this.trackIndex);
+        return;
+      }
       this.restartScheduler();
     }
 
     stopMusic() {
       this.musicEnabled = false;
+      if (this.playlist.length) {
+        this.stopPlaylist();
+        return;
+      }
       if (this.timerId) {
         clearInterval(this.timerId);
         this.timerId = null;
@@ -170,6 +331,14 @@
     }
 
     setSong(index) {
+      if (this.playlist.length) {
+        const len = this.playlist.length;
+        this.trackIndex = ((Math.floor(index) % len) + len) % len;
+        if (this.musicEnabled) this.playTrack(this.trackIndex);
+        else this.emitTrack();
+        return this.getCurrentSong();
+      }
+
       this.currentSong = ((index % SONGS.length) + SONGS.length) % SONGS.length;
       this.step = 0;
       if (this.musicEnabled) {
@@ -179,10 +348,14 @@
     }
 
     nextSong() {
+      if (this.playlist.length) {
+        return this.setSong(this.trackIndex + 1);
+      }
       return this.setSong(this.currentSong + 1);
     }
 
     restartScheduler() {
+      if (this.playlist.length) return;
       if (this.timerId) {
         clearInterval(this.timerId);
         this.timerId = null;
@@ -194,6 +367,7 @@
     }
 
     tickStep() {
+      if (this.playlist.length) return;
       if (!this.musicEnabled || this.muted) return;
       const ctx = this.ensureContext();
       if (!ctx || ctx.state !== 'running') return;
@@ -318,6 +492,23 @@
 
     playLikeMilestone() {
       this.playSequence([60, 63, 67, 70, 75, 79], 'square', 0.05, 0.18);
+    }
+
+    playCombo(level) {
+      const base = 72 + Math.min(12, Math.max(0, level - 1) * 2);
+      this.playSequence([base, base + 4, base + 7], 'triangle', 0.05, 0.22);
+    }
+
+    playHype() {
+      this.playSequence([55, 62, 67, 72, 76, 79, 84, 88], 'sawtooth', 0.06, 0.28);
+    }
+
+    playShuffle() {
+      this.playSequence([72, 76, 79, 76, 72], 'sine', 0.035, 0.14);
+    }
+
+    playJoin() {
+      this.playSequence([69, 73], 'sine', 0.06, 0.14);
     }
 
     playGiftEffect(type) {

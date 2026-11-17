@@ -2,8 +2,13 @@
 <html lang="sq">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FJALËMANIA LIVE 🇦🇱 — TikTok Word Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b10" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>FJALËMANIA LIVE 🇦🇱 — Lojë fjalësh për TikTok Live</title>
+  <meta name="description" content="Lojë interaktive fjalësh për TikTok Live: shkruaj fjalët në koment, likes zbulojnë shkronja, dhuratat japin 3X VIP." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -13,149 +18,204 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <button id="obsExitBtn" class="obs-exit-btn">✕ Dil nga OBS Mode</button>
+  <div class="app">
+    <!-- ================= 9:16 STREAM STAGE (OBS / CAPTURE SOURCE) ================= -->
+    <main class="stage-wrap" id="stageWrap">
+      <div class="stage theme-kuqezi" id="stage" aria-label="FjalëMania Live">
+        <div class="stage-bg"></div>
+        <canvas id="fxCanvas" class="fx-canvas" width="1080" height="1920" aria-hidden="true"></canvas>
+        <div id="flashLayer" class="flash-layer" aria-hidden="true"></div>
 
-  <main class="studio-layout">
-    <!-- 9:16 CLEAN MOBILE STREAM CANVAS -->
-    <section class="phone-wrapper">
-      <div id="phoneStage" class="phone-stage theme-kuqezi">
-
-        <!-- ZONE 1: HEADER & LIKES HINT BAR -->
-        <header class="zone-header">
-          <div class="header-top-row">
-            <div class="round-title">
-              <span class="live-dot"></span>
-              <span id="headerCategory">Raundi 1 • Shqipëria &amp; Kombi 🇦🇱</span>
-            </div>
-            <div class="header-pills">
-              <span class="pill viewers">👁️ <span id="viewerCount">185</span></span>
-              <span class="pill timer" id="roundTimer">02:00</span>
-              <span class="pill mult" id="multiplierBadge">1X</span>
-            </div>
-          </div>
-
-          <div class="likes-bar-wrap">
-            <div class="likes-meta">
-              <span>❤️ <strong id="likesCountText">0</strong> Likes</span>
-              <span id="likesGoalText">Caku: 1,000 → Zbulo Shkronja 🔍</span>
-            </div>
-            <div class="likes-track">
-              <div id="likesFill" class="likes-fill"></div>
-            </div>
-          </div>
-        </header>
-
-        <!-- ZONE 2: SINGLE DEDICATED ANNOUNCEMENT PILL -->
-        <div id="announceBar" class="zone-announce">
-          <span id="announceText">Shkruaj fjalët në koment për të fituar pikë!</span>
+        <div id="safeGuide" class="safe-guide" aria-hidden="true">
+          <div class="safe-line top"></div>
+          <div class="safe-line bottom"></div>
+          <div class="safe-line right"></div>
+          <span class="safe-cap top">TikTok header</span>
+          <span class="safe-cap bottom">TikTok komente · dhurata</span>
+          <span class="safe-cap right">TikTok butonat</span>
         </div>
 
-        <!-- ZONE 3: SPACIOUS WORD GRID + CENTERED LETTER WHEEL -->
-        <section class="zone-hero">
-          <div id="wordsGrid" class="words-grid"></div>
+        <div class="stage-inner">
+          <!-- HUD -->
+          <header class="hud">
+            <div class="hud-title">
+              <h1 class="category" id="categoryText">Shqipëria &amp; Kombi 🇦🇱</h1>
+            </div>
 
-          <div class="wheel-area">
-            <div id="wheelRing" class="wheel-ring">
-              <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 184 184" aria-hidden="true">
-                <polyline id="wheelLine" class="wheel-line" points="" />
-              </svg>
-              <div id="wheelCenter" class="wheel-center" title="Kliko për të përzier shkronjat">
-                <span id="wheelCenterTop" class="wc-top">0 / 7</span>
-                <span id="wheelCenterSub" class="wc-sub">FJALË</span>
+            <div class="likes">
+              <div class="likes-head">
+                <span class="likes-total">LIKES <b id="likesTotal">0</b></span>
+                <span class="spacer"></span>
+                <span class="likes-level" id="likesLevel">NIVELI 1</span>
+                <span class="likes-goal" id="likesGoal">0/200 LIKES ZBULON 1 SHKRONJË</span>
+                <span class="pill mult" id="multPill">1X</span>
               </div>
+              <div class="likes-track">
+                <div class="likes-fill" id="likesFill"></div>
+              </div>
+              <div class="round-track"><div class="round-fill" id="roundFill"></div></div>
             </div>
-          </div>
-        </section>
+          </header>
 
-        <!-- ZONE 4: TOP 5 FINDERS STRIP & GIFT FOOTER -->
-        <footer class="zone-footer">
-          <div class="top5-card">
-            <div class="top5-head">
-              <span>🏆 TOP 5 GJETËSIT</span>
-              <span id="vipBadgeText" class="vip-tag">🎵 <span id="songTag">Valle Elektronike</span></span>
+          <!-- DYNAMIC CALLOUT / INSTRUCTION -->
+          <div class="cta" id="ctaBar" role="status" aria-live="polite">
+            <span class="cta-icon" id="ctaIcon">💬</span>
+            <span class="cta-text" id="ctaText">SHKRUAJ FJALËN NË KOMENT</span>
+          </div>
+
+          <!-- GAME AREA -->
+          <section class="hero">
+            <div class="golden" id="goldenCard">
+              <div class="golden-head">
+                <span class="golden-title">👑 FJALA E ARTË</span>
+                <span class="golden-mult">3X</span>
+              </div>
+              <div class="golden-tiles" id="goldenTiles"></div>
+              <div class="golden-sub" id="goldenSub">9 shkronja · +270 PK</div>
             </div>
-            <div id="top5Strip" class="top5-strip"></div>
-          </div>
 
-          <div class="gift-footer-pill">
-            <span>🌹 Ngjyrë</span>
-            <span>•</span>
-            <span>🎵 Këngë</span>
-            <span>•</span>
-            <span>⚡ Hint</span>
-            <span>•</span>
-            <span>🦅 3X VIP</span>
-          </div>
-        </footer>
+            <div class="board" id="wordsGrid"></div>
+          </section>
 
-        <!-- Fullscreen Celebration for Eagle VIP Gift Only -->
-        <div id="eagleOverlay" class="eagle-overlay">
-          <div class="eagle-emblem">🦅</div>
-          <div class="eagle-title">STUHIA SHQIPTARE 3X!</div>
-          <div id="eagleDonorText" class="eagle-donor">@andi_tirana aktivizoi 3X VIP!</div>
+          <!-- LETTER BANK -->
+          <section class="letters">
+            <div class="letters-head">
+              <span>🔤 SHKRONJAT</span>
+              <span id="progressText">0 / 7 gjetur</span>
+            </div>
+            <div class="letter-bank" id="letterBank"></div>
+          </section>
+
+          <!-- GIFT CHEAT SHEET -->
+          <div class="gift-legend" id="giftLegend"></div>
+
+          <!-- FULL-WIDTH TOP 3 LEADERBOARD -->
+          <footer class="foot">
+            <div class="top3" id="top3Strip"></div>
+          </footer>
+        </div>
+
+        <!-- HOW TO PLAY (sits in TikTok's bottom UI area) -->
+        <div class="rules" aria-label="Rregullat e lojës">
+          <div class="rules-title">📜 SI TË LUAJ</div>
+          <div class="rules-grid">
+            <div class="rule"><span class="ico">💬</span><span>Komento <b>fjalën</b></span></div>
+            <div class="rule"><span class="ico">❤️</span><span><b>200+ likes</b> = 1 shkronjë</span></div>
+            <div class="rule"><span class="ico">🎁</span><span>Dhurata = <b>Hint / 3X</b></span></div>
+            <div class="rule"><span class="ico">👑</span><span>Fjala e Artë = <b>3X</b></span></div>
+          </div>
+        </div>
+
+        <!-- ROUND RESULT OVERLAY -->
+        <div class="overlay" id="roundOverlay" aria-hidden="true">
+          <div class="overlay-card">
+            <div class="overlay-emoji" id="overlayEmoji">🏆</div>
+            <div class="overlay-title" id="overlayTitle">PERFEKT!</div>
+            <div class="overlay-list" id="overlayList"></div>
+            <div class="overlay-next" id="overlayNext">Raundi tjetër në 3…</div>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- COMPACT 340PX STUDIO CONTROL SIDEBAR -->
-    <aside class="studio-panel">
-      <div class="panel-top">
+      <button id="obsExitBtn" class="obs-exit-btn" type="button">✕ Exit OBS</button>
+
+      <div class="phone-tools" id="phoneTools">
+        <button id="phoneMusicBtn" class="phone-tool" type="button" title="Muzikë" aria-label="Muzikë">🔊</button>
+        <button id="phoneFullscreenBtn" class="phone-tool" type="button" title="Fullscreen" aria-label="Fullscreen">⛶</button>
+      </div>
+    </main>
+
+    <!-- ================= HOST CONTROL PANEL ================= -->
+    <aside class="studio" id="studioPanel">
+      <div class="studio-head">
         <div>
-          <h1>FjalëMania Studio 🇦🇱</h1>
-          <p class="panel-sub">Kontroll i pastër për Live</p>
+          <h1>FJALËMANIA <span>STUDIO</span></h1>
+          <p>Kontroll për TikTok Live</p>
         </div>
-        <button id="obsToggleBtn" class="btn btn-outline">📺 OBS Mode</button>
-      </div>
-
-      <!-- Comment Bar -->
-      <div class="panel-block">
-        <label class="block-title">💬 Komento &amp; Testo</label>
-        <div class="comment-inputs">
-          <input id="testUserInput" class="input input-user" type="text" value="andi_tirana" placeholder="@user" />
-          <input id="testCommentInput" class="input" type="text" placeholder="Fjalë ose #tirana..." />
-          <button id="sendCommentBtn" class="btn btn-primary">Dërgo</button>
-        </div>
-        <div id="quickWordButtons" class="chip-row"></div>
-      </div>
-
-      <!-- Traffic Mode -->
-      <div class="panel-block">
-        <label class="block-title">👥 Trafiku Live</label>
-        <div class="seg-row">
-          <button data-sim="manual" class="btn sim-btn">Manual (Qetë)</button>
-          <button data-sim="normal" class="btn sim-btn active">Normal</button>
-          <button data-sim="viral" class="btn sim-btn">🔥 1K Live</button>
-        </div>
-      </div>
-
-      <!-- Gifts (1-Click) -->
-      <div class="panel-block">
-        <label class="block-title">🎁 Dhuratat (1-Klik)</label>
-        <div class="gift-grid">
-          <button data-gift="theme" class="btn">🌹 Ngjyrë</button>
-          <button data-gift="song" class="btn">🎵 Këngë</button>
-          <button data-gift="hint" class="btn">⚡ Hint</button>
-          <button data-gift="eagle" class="btn btn-gold gift-span">🦅 Shqiponja (3X VIP)</button>
-        </div>
-      </div>
-
-      <!-- Quick Controls -->
-      <div class="panel-block">
-        <label class="block-title">⚙️ Kontrolli i Lojës</label>
-        <div class="quick-grid">
-          <button id="like500Btn" class="btn">+500 ❤️ Likes</button>
-          <button id="toggleMusicBtn" class="btn">🔊 Muzikë</button>
-          <button id="hintWordBtn" class="btn">💡 Zbulo Fjalë</button>
-          <button id="nextRoundBtn" class="btn">➡️ Raundi Tjetër</button>
-        </div>
+        <button id="obsToggleBtn" class="btn btn-ghost" type="button">📺 OBS</button>
       </div>
 
       <div class="bridge-status">
-        <span>🔌 Webhook: <code>POST /api/event</code></span>
-        <span id="sseBadge" class="sse-pill offline">Demo</span>
+        <span class="status-dot" id="bridgeDot"></span>
+        <b id="bridgeText">Duke u lidhur…</b>
+        <span class="spacer"></span>
+        <span id="eventCounter">0 ngjarje</span>
+      </div>
+
+      <div class="studio-block">
+        <label class="block-title">💬 Testo komentin</label>
+        <div class="row">
+          <input id="testUserInput" class="input input-user" type="text" value="andi_tirana" placeholder="@user" />
+          <input id="testCommentInput" class="input" type="text" placeholder="Shkruaj fjalën…" />
+          <button id="sendCommentBtn" class="btn btn-primary" type="button">Dërgo</button>
+        </div>
+        <div id="quickWordButtons" class="chips"></div>
+      </div>
+
+      <div class="studio-block">
+        <label class="block-title">🎁 Dhuratat (1-klik test)</label>
+        <div id="giftButtons" class="grid-4"></div>
+        <p class="hint">Çdo dhuratë +1 HYPER për të gjithë. 5/5 = Fjalë e Artë + 3X.</p>
+      </div>
+
+      <div class="studio-block">
+        <label class="block-title">❤️ Likes &amp; kontroll</label>
+        <div class="grid-3">
+          <button id="like500Btn" class="btn" type="button">+500 ❤️</button>
+          <button id="hintBtn" class="btn" type="button">+2 🔍</button>
+          <button id="revealBtn" class="btn" type="button">💡 Fjalë</button>
+          <button id="frenzyBtn" class="btn" type="button">🔥 2X</button>
+          <button id="nextRoundBtn" class="btn" type="button">➡️ Raundi</button>
+          <button id="toggleMusicBtn" class="btn" type="button">🔊 Muzikë</button>
+        </div>
+        <div class="music-bar">
+          <span id="nowPlaying" class="now-playing" title="Muzika">🎵 Procedural</span>
+          <input id="musicVolume" class="volume" type="range" min="0" max="100" value="55" aria-label="Volumi i muzikës" />
+        </div>
+      </div>
+
+      <div class="studio-block">
+        <label class="block-title">👥 Simulator</label>
+        <div class="sim-row">
+          <label class="switch">
+            <input type="checkbox" id="simToggle" checked />
+            <span class="switch-track"></span>
+            <span class="switch-text">Auto</span>
+          </label>
+          <button class="chip sim-btn active" data-sim="normal" type="button">Normal</button>
+          <button class="chip sim-btn" data-sim="viral" type="button">🔥 Viral</button>
+        </div>
+        <p class="hint" id="simHint">Fiket vetë kur lidhet bridge-i live.</p>
+      </div>
+
+      <div class="studio-block">
+        <label class="block-title">🔌 Bridge &amp; OBS</label>
+        <div class="copy-row">
+          <code>POST /api/event</code>
+          <button class="btn btn-mini" id="copyHookBtn" type="button">Kopjo</button>
+        </div>
+        <div class="copy-row">
+          <code>/?obs=1</code>
+          <button class="btn btn-mini" id="copyObsBtn" type="button">Kopjo URL</button>
+        </div>
+        <div class="copy-row">
+          <code id="phoneUrl">📱 Duke kërkuar rrjetin…</code>
+          <button class="btn btn-mini" id="copyPhoneBtn" type="button">Kopjo</button>
+        </div>
+        <div class="row">
+          <button class="btn btn-ghost" id="safeToggle" type="button">📐 Safe zones</button>
+          <button class="btn btn-ghost" id="resetBtn" type="button">♻️ Reset</button>
+        </div>
+        <p class="hint">
+          Telefoni: hap URL-në sipër në të njëjtin Wi‑Fi. Nëse nuk hapet, <code>npm run firewall</code> si Administrator.
+        </p>
+        <p class="hint">
+          OBS: Browser source <b>1080×1920</b>, URL <code>/?obs=1</code>.<br />
+          Shkurtoret: <b>Space</b> raund · <b>H</b> hint · <b>L</b> likes · <b>M</b> muzikë · <b>E</b> 3X
+        </p>
       </div>
     </aside>
-  </main>
+  </div>
 
   <script src="/words-al.js"></script>
   <script src="/audio.js"></script>
