@@ -56,7 +56,13 @@
 
           <div class="wheel-area">
             <div id="wheelRing" class="wheel-ring">
-              <button id="shuffleBtn" class="wheel-center-btn" title="Përziej Shkronjat">🔀</button>
+              <svg id="wheelSvg" class="wheel-svg" viewBox="0 0 184 184" aria-hidden="true">
+                <polyline id="wheelLine" class="wheel-line" points="" />
+              </svg>
+              <div id="wheelCenter" class="wheel-center" title="Kliko për të përzier shkronjat">
+                <span id="wheelCenterTop" class="wc-top">0 / 7</span>
+                <span id="wheelCenterSub" class="wc-sub">FJALË</span>
+              </div>
             </div>
           </div>
         </section>

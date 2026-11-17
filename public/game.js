@@ -28,7 +28,10 @@
     songIdx: 0,
     simMode: 'normal', // 'manual' | 'normal' | 'viral'
     viewers: 185,
-    roundTransitioning: false
+    roundTransitioning: false,
+    wheelNodes: [],
+    traceTimers: [],
+    isTracing: false
   };
 
   const el = {
@@ -44,7 +47,11 @@
     announceText: document.getElementById('announceText'),
     wordsGrid: document.getElementById('wordsGrid'),
     wheelRing: document.getElementById('wheelRing'),
-    shuffleBtn: document.getElementById('shuffleBtn'),
+    wheelSvg: document.getElementById('wheelSvg'),
+    wheelLine: document.getElementById('wheelLine'),
+    wheelCenter: document.getElementById('wheelCenter'),
+    wheelCenterTop: document.getElementById('wheelCenterTop'),
+    wheelCenterSub: document.getElementById('wheelCenterSub'),
     top5Strip: document.getElementById('top5Strip'),
     vipBadgeText: document.getElementById('vipBadgeText'),
     songTag: document.getElementById('songTag'),
@@ -156,23 +163,89 @@
     renderQuickWordButtons();
   }
 
+  function clearWheelTrace() {
+    state.traceTimers.forEach((id) => clearTimeout(id));
+    state.traceTimers = [];
+    state.isTracing = false;
+    el.wheelLine.setAttribute('points', '');
+    el.wheelCenter.classList.remove('tracing');
+    state.wheelNodes.forEach((n) => n.el.classList.remove('active'));
+    updateWheelIdleCenter();
+  }
+
+  function updateWheelIdleCenter() {
+    if (state.isTracing) return;
+    const solved = state.boardWords.filter((w) => w.solved).length;
+    const total = state.boardWords.length;
+    el.wheelCenterTop.textContent = `${solved} / ${total}`;
+    el.wheelCenterSub.textContent = 'FJALË';
+  }
+
+  function traceWordOnWheel(rawWord, finderName) {
+    clearWheelTrace();
+    const normWord = DATA.normalizeAlbanian(rawWord);
+    if (!normWord || !state.wheelNodes.length) return;
+
+    const used = new Set();
+    const matchedNodes = [];
+    for (const ch of normWord) {
+      const idx = state.wheelNodes.findIndex((n, i) => !used.has(i) && n.norm === ch);
+      if (idx !== -1) {
+        used.add(idx);
+        matchedNodes.push(state.wheelNodes[idx]);
+      }
+    }
+    if (!matchedNodes.length) return;
+
+    state.isTracing = true;
+    el.wheelCenter.classList.add('tracing');
+    el.wheelCenterTop.textContent = rawWord.toUpperCase();
+    el.wheelCenterSub.textContent = `@${finderName}`;
+
+    const pts = [];
+    matchedNodes.forEach((node, step) => {
+      const t = setTimeout(() => {
+        node.el.classList.add('active');
+        pts.push(`${node.cx.toFixed(1)},${node.cy.toFixed(1)}`);
+        el.wheelLine.setAttribute('points', pts.join(' '));
+      }, step * 85);
+      state.traceTimers.push(t);
+    });
+
+    const resetTimer = setTimeout(() => {
+      clearWheelTrace();
+    }, matchedNodes.length * 85 + 1400);
+    state.traceTimers.push(resetTimer);
+  }
+
   function renderWheel() {
+    clearWheelTrace();
     el.wheelRing.querySelectorAll('.wheel-letter').forEach((n) => n.remove());
+    state.wheelNodes = [];
+
     const total = state.wheelLetters.length;
-    const radius = 64;
-    const center = 86;
+    const radius = 68;
+    const center = 92;
 
     state.wheelLetters.forEach((ch, idx) => {
       const angle = (idx / total) * Math.PI * 2 - Math.PI / 2;
-      const x = center + radius * Math.cos(angle) - 19;
-      const y = center + radius * Math.sin(angle) - 19;
+      const cx = center + radius * Math.cos(angle);
+      const cy = center + radius * Math.sin(angle);
       const node = document.createElement('div');
       node.className = 'wheel-letter';
       node.textContent = ch;
-      node.style.left = `${x}px`;
-      node.style.top = `${y}px`;
+      node.style.left = `${cx - 19}px`;
+      node.style.top = `${cy - 19}px`;
       el.wheelRing.appendChild(node);
+      state.wheelNodes.push({
+        el: node,
+        char: ch,
+        norm: DATA.normalizeAlbanian(ch),
+        cx,
+        cy
+      });
     });
+    updateWheelIdleCenter();
   }
 
   function renderBoard() {
@@ -219,6 +292,7 @@
       slot.appendChild(caption);
       el.wordsGrid.appendChild(slot);
     });
+    updateWheelIdleCenter();
   }
 
   function renderTop5() {
@@ -413,6 +487,7 @@
 
       awardPoints(player, totalPts);
       SFX.playWordFound(boardMatch.isGolden, false);
+      traceWordOnWheel(boardMatch.raw, player.user);
 
       if (boardMatch.isGolden) {
         setAnnouncement(`👑 @${player.user} gjeti FJALËN E ARTË "${boardMatch.raw}" (+${totalPts} PK)!`, 'king');
@@ -435,6 +510,7 @@
       const bonusPts = 25 * getMultiplier();
       awardPoints(player, bonusPts);
       SFX.playBonusWord();
+      traceWordOnWheel(normGuess, player.user);
       setAnnouncement(`🌟 Fjalë Bonus "${normGuess}" nga @${player.user} (+${bonusPts} PK)`);
       renderTop5();
     }
@@ -564,8 +640,16 @@
 
   setInterval(simulatorTick, 2200);
 
+  // Auto-shuffle letters every 15s for fresh visual perspective
+  setInterval(() => {
+    if (!state.isTracing && !state.roundTransitioning) {
+      shuffleArray(state.wheelLetters);
+      renderWheel();
+    }
+  }, 15000);
+
   // Wire Controls
-  el.shuffleBtn.addEventListener('click', () => {
+  el.wheelCenter.addEventListener('click', () => {
     SFX.unlock();
     shuffleArray(state.wheelLetters);
     renderWheel();
