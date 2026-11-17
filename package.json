@@ -1,0 +1,18 @@
+{
+  "name": "fjalemania-live-al",
+  "version": "1.0.0",
+  "description": "FJALËMANIA LIVE AL — Interactive 9:16 TikTok Live Mobile Word Game for the Albanian & Diaspora Market",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:win": "node --preserve-symlinks --preserve-symlinks-main server.js"
+  },
+  "keywords": [
+    "tiktok-live",
+    "albania",
+    "word-game",
+    "interactive-stream",
+    "fjalemania"
+  ],
+  "license": "MIT"
+}

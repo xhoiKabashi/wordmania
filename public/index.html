@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FJALËMANIA LIVE 🇦🇱 — TikTok Word Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <button id="obsExitBtn" class="obs-exit-btn">✕ Dil nga OBS Mode</button>
+
+  <main class="studio-layout">
+    <!-- 9:16 CLEAN MOBILE STREAM CANVAS -->
+    <section class="phone-wrapper">
+      <div id="phoneStage" class="phone-stage theme-kuqezi">
+
+        <!-- ZONE 1: HEADER & LIKES HINT BAR -->
+        <header class="zone-header">
+          <div class="header-top-row">
+            <div class="round-title">
+              <span class="live-dot"></span>
+              <span id="headerCategory">Raundi 1 • Shqipëria &amp; Kombi 🇦🇱</span>
+            </div>
+            <div class="header-pills">
+              <span class="pill viewers">👁️ <span id="viewerCount">185</span></span>
+              <span class="pill timer" id="roundTimer">02:00</span>
+              <span class="pill mult" id="multiplierBadge">1X</span>
+            </div>
+          </div>
+
+          <div class="likes-bar-wrap">
+            <div class="likes-meta">
+              <span>❤️ <strong id="likesCountText">0</strong> Likes</span>
+              <span id="likesGoalText">Caku: 1,000 → Zbulo Shkronja 🔍</span>
+            </div>
+            <div class="likes-track">
+              <div id="likesFill" class="likes-fill"></div>
+            </div>
+          </div>
+        </header>
+
+        <!-- ZONE 2: SINGLE DEDICATED ANNOUNCEMENT PILL -->
+        <div id="announceBar" class="zone-announce">
+          <span id="announceText">Shkruaj fjalët në koment për të fituar pikë!</span>
+        </div>
+
+        <!-- ZONE 3: SPACIOUS WORD GRID + CENTERED LETTER WHEEL -->
+        <section class="zone-hero">
+          <div id="wordsGrid" class="words-grid"></div>
+
+          <div class="wheel-area">
+            <div id="wheelRing" class="wheel-ring">
+              <button id="shuffleBtn" class="wheel-center-btn" title="Përziej Shkronjat">🔀</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ZONE 4: TOP 5 FINDERS STRIP & GIFT FOOTER -->
+        <footer class="zone-footer">
+          <div class="top5-card">
+            <div class="top5-head">
+              <span>🏆 TOP 5 GJETËSIT</span>
+              <span id="vipBadgeText" class="vip-tag">🎵 <span id="songTag">Valle Elektronike</span></span>
+            </div>
+            <div id="top5Strip" class="top5-strip"></div>
+          </div>
+
+          <div class="gift-footer-pill">
+            <span>🌹 Ngjyrë</span>
+            <span>•</span>
+            <span>🎵 Këngë</span>
+            <span>•</span>
+            <span>⚡ Hint</span>
+            <span>•</span>
+            <span>🦅 3X VIP</span>
+          </div>
+        </footer>
+
+        <!-- Fullscreen Celebration for Eagle VIP Gift Only -->
+        <div id="eagleOverlay" class="eagle-overlay">
+          <div class="eagle-emblem">🦅</div>
+          <div class="eagle-title">STUHIA SHQIPTARE 3X!</div>
+          <div id="eagleDonorText" class="eagle-donor">@andi_tirana aktivizoi 3X VIP!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPACT 340PX STUDIO CONTROL SIDEBAR -->
+    <aside class="studio-panel">
+      <div class="panel-top">
+        <div>
+          <h1>FjalëMania Studio 🇦🇱</h1>
+          <p class="panel-sub">Kontroll i pastër për Live</p>
+        </div>
+        <button id="obsToggleBtn" class="btn btn-outline">📺 OBS Mode</button>
+      </div>
+
+      <!-- Comment Bar -->
+      <div class="panel-block">
+        <label class="block-title">💬 Komento &amp; Testo</label>
+        <div class="comment-inputs">
+          <input id="testUserInput" class="input input-user" type="text" value="andi_tirana" placeholder="@user" />
+          <input id="testCommentInput" class="input" type="text" placeholder="Fjalë ose #tirana..." />
+          <button id="sendCommentBtn" class="btn btn-primary">Dërgo</button>
+        </div>
+        <div id="quickWordButtons" class="chip-row"></div>
+      </div>
+
+      <!-- Traffic Mode -->
+      <div class="panel-block">
+        <label class="block-title">👥 Trafiku Live</label>
+        <div class="seg-row">
+          <button data-sim="manual" class="btn sim-btn">Manual (Qetë)</button>
+          <button data-sim="normal" class="btn sim-btn active">Normal</button>
+          <button data-sim="viral" class="btn sim-btn">🔥 1K Live</button>
+        </div>
+      </div>
+
+      <!-- Gifts (1-Click) -->
+      <div class="panel-block">
+        <label class="block-title">🎁 Dhuratat (1-Klik)</label>
+        <div class="gift-grid">
+          <button data-gift="theme" class="btn">🌹 Ngjyrë</button>
+          <button data-gift="song" class="btn">🎵 Këngë</button>
+          <button data-gift="hint" class="btn">⚡ Hint</button>
+          <button data-gift="eagle" class="btn btn-gold gift-span">🦅 Shqiponja (3X VIP)</button>
+        </div>
+      </div>
+
+      <!-- Quick Controls -->
+      <div class="panel-block">
+        <label class="block-title">⚙️ Kontrolli i Lojës</label>
+        <div class="quick-grid">
+          <button id="like500Btn" class="btn">+500 ❤️ Likes</button>
+          <button id="toggleMusicBtn" class="btn">🔊 Muzikë</button>
+          <button id="hintWordBtn" class="btn">💡 Zbulo Fjalë</button>
+          <button id="nextRoundBtn" class="btn">➡️ Raundi Tjetër</button>
+        </div>
+      </div>
+
+      <div class="bridge-status">
+        <span>🔌 Webhook: <code>POST /api/event</code></span>
+        <span id="sseBadge" class="sse-pill offline">Demo</span>
+      </div>
+    </aside>
+  </main>
+
+  <script src="/words-al.js"></script>
+  <script src="/audio.js"></script>
+  <script src="/game.js"></script>
+</body>
+</html>
