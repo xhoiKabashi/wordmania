@@ -30,7 +30,7 @@
     comboWindowMs: 14000,
     comboStep: 0.25,
     comboMax: 2,
-    maxParticles: 240,
+    maxParticles: 110,
     seasonRounds: 90
   };
 
@@ -329,14 +329,35 @@
   const fx = (function () {
     const canvas = el.fx;
     const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+    const SCALE = W / 1080;
     const COLORS = ['#fbbf24', '#ef4444', '#22d3ee', '#a3e635', '#f472b6', '#ffffff', '#f97316'];
+    const emojiCache = new Map();
     let parts = [];
     let raf = null;
 
+    function emojiSprite(emoji) {
+      let sprite = emojiCache.get(emoji);
+      if (sprite) return sprite;
+      const size = 28;
+      sprite = document.createElement('canvas');
+      sprite.width = size;
+      sprite.height = size;
+      const sctx = sprite.getContext('2d');
+      sctx.font = '18px "Segoe UI Emoji", "Apple Color Emoji", serif';
+      sctx.textAlign = 'center';
+      sctx.textBaseline = 'middle';
+      sctx.fillText(emoji, size / 2, size / 2);
+      emojiCache.set(emoji, sprite);
+      return sprite;
+    }
+
     function spawn(x, y, opts = {}) {
-      const count = opts.count || 30;
+      const count = opts.count || 20;
       const power = opts.power || 15;
       const colors = opts.colors || COLORS;
+      const sprite = opts.emoji ? emojiSprite(opts.emoji) : null;
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = power * (0.3 + Math.random());
@@ -347,25 +368,29 @@
           vy: Math.sin(angle) * speed - 4,
           g: 0.42 + Math.random() * 0.3,
           life: 1,
-          decay: 0.016 + Math.random() * 0.014,
-          size: 4 + Math.random() * 7,
+          decay: 0.018 + Math.random() * 0.015,
+          size: (4 + Math.random() * 7) * SCALE,
           color: pick(colors),
           rot: Math.random() * Math.PI,
           vr: (Math.random() - 0.5) * 0.35,
-          emoji: opts.emoji || '',
+          sprite,
           shape: Math.random() < 0.45 ? 'rect' : 'circle'
         });
       }
       if (parts.length > CFG.maxParticles) {
-        parts = parts.slice(parts.length - CFG.maxParticles);
+        parts.splice(0, parts.length - CFG.maxParticles);
       }
       if (!raf) raf = requestAnimationFrame(loop);
     }
 
     function loop() {
-      ctx.clearRect(0, 0, 1080, 1920);
-      for (const p of parts) {
-        if (p.life <= 0) continue;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, W, H);
+
+      let write = 0;
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
         p.vx *= 0.994;
         p.vy *= 0.994;
         p.vy += p.g;
@@ -375,15 +400,14 @@
         p.life -= p.decay;
         if (p.life <= 0 || p.y > 1980) continue;
 
-        ctx.save();
-        ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        if (p.emoji) {
-          ctx.font = '34px "Segoe UI Emoji", "Apple Color Emoji", serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(p.emoji, 0, 0);
+        parts[write++] = p;
+        const cos = Math.cos(p.rot);
+        const sin = Math.sin(p.rot);
+        ctx.globalAlpha = p.life < 1 ? p.life : 1;
+        ctx.setTransform(cos, sin, -sin, cos, p.x * SCALE, p.y * SCALE);
+
+        if (p.sprite) {
+          ctx.drawImage(p.sprite, -14, -14);
         } else if (p.shape === 'rect') {
           ctx.fillStyle = p.color;
           ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 1.7);
@@ -393,20 +417,24 @@
           ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
           ctx.fill();
         }
-        ctx.restore();
       }
-      parts = parts.filter((p) => p.life > 0 && p.y < 1980);
-      if (parts.length) {
+      parts.length = write;
+
+      if (write > 0) {
         raf = requestAnimationFrame(loop);
       } else {
         raf = null;
-        ctx.clearRect(0, 0, 1080, 1920);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = 1;
+        ctx.clearRect(0, 0, W, H);
       }
     }
 
     function clear() {
-      parts = [];
-      ctx.clearRect(0, 0, 1080, 1920);
+      parts.length = 0;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = 1;
+      ctx.clearRect(0, 0, W, H);
     }
 
     return { spawn, clear };
@@ -423,15 +451,15 @@
     };
   }
 
-  function burstAt(node, count = 24, emoji = '') {
+  function burstAt(node, count = 16, emoji = '') {
     const pt = stagePoint(node);
     fx.spawn(pt.x, pt.y, { count, emoji, power: emoji ? 17 : 14 });
   }
 
   function bigConfetti(emoji = '') {
-    fx.spawn(540, 720, { count: 46, power: 23, emoji });
-    fx.spawn(240, 980, { count: 18, power: 18 });
-    fx.spawn(840, 980, { count: 18, power: 18 });
+    fx.spawn(540, 720, { count: 28, power: 23, emoji });
+    fx.spawn(240, 980, { count: 12, power: 18 });
+    fx.spawn(840, 980, { count: 12, power: 18 });
   }
 
   function flash(kind) {
@@ -452,9 +480,41 @@
      CTA / ANNOUNCEMENTS
      --------------------------------------------------------------- */
 
+  const GIFT_SVGS = {
+    theme: `<img class="gift-img" src="/gifts/rose.png" alt="Rose" />`,
+    song: `<img class="gift-img" src="/gifts/tiktok.png" alt="TikTok" />`,
+    hint: `<img class="gift-img" src="/gifts/rocket.png" alt="Rocket" />`,
+    eagle: `<img class="gift-img" src="/gifts/finger-heart.png" alt="Finger Heart" />`
+  };
+
+  const UI_SVGS = {
+    '💬': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-chat"/></svg>`,
+    '❤️': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-heart"/></svg>`,
+    '👑': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-crown"/></svg>`,
+    '🎁': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-gift"/></svg>`,
+    '⚡': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-bolt"/></svg>`,
+    '🔥': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-flame"/></svg>`,
+    '🏆': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-trophy"/></svg>`,
+    '🎉': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-spark"/></svg>`,
+    '🌹': GIFT_SVGS.theme,
+    '🎵': GIFT_SVGS.song,
+    '🚀': GIFT_SVGS.hint,
+    '🫰': GIFT_SVGS.eagle
+  };
+
+  function renderIcon(node, key) {
+    const svg = UI_SVGS[key];
+    if (svg) {
+      node.innerHTML = svg;
+    } else {
+      node.textContent = key || '';
+    }
+  }
+
   function setCta(icon, text, kind) {
     el.ctaBar.className = `cta ${kind || 'idle'}`;
-    el.ctaIcon.textContent = icon;
+    el.ctaIcon.dataset.icon = icon || '';
+    renderIcon(el.ctaIcon, icon);
     el.ctaText.textContent = text;
     el.ctaText.title = text;
   }
@@ -507,7 +567,13 @@
   function renderMult() {
     if (phoneMode) return;
     const m = multiplier();
-    el.multPill.textContent = m > 1 ? `${m}X` : '1X';
+    if (m > 1) {
+      const until = m === 3 ? state.eagleUntil : state.frenzyUntil;
+      const secs = Math.max(1, Math.ceil((until - Date.now()) / 1000));
+      el.multPill.textContent = `${m}X · ${secs}s`;
+    } else {
+      el.multPill.textContent = '1X';
+    }
     el.multPill.classList.toggle('on', m > 1);
     el.stage.classList.toggle('eagle', m === 3);
     el.stage.classList.toggle('frenzy', m === 2);
@@ -520,7 +586,7 @@
     const level = Math.max(1, Math.round((goal - CFG.likeGoalStart) / CFG.likeGoalStep) + 1);
     el.likesFill.style.width = `${(progress / goal) * 100}%`;
     el.likesLevel.textContent = `NIVELI ${level}`;
-    el.likesGoal.textContent = `${fmt(progress)}/${fmt(goal)} LIKES ZBULON 1 SHKRONJË`;
+    el.likesGoal.textContent = `${fmt(progress)} / ${fmt(goal)} → ZBULON 1 SHKRONJË`;
   }
 
   function renderProgress() {
@@ -558,8 +624,12 @@
       captionClass += ' solved-by';
       if (entry.points > 0) {
         captionText = `@${entry.finder} +${fmt(entry.points)}`;
+      } else if (entry.finder === 'HYPER') {
+        captionText = '🎁 HYPER';
+      } else if (entry.finder && entry.finder !== 'Hint') {
+        captionText = `🎁 @${entry.finder}`;
       } else {
-        captionText = entry.finder === 'HYPER' ? '🎁 HYPER' : '💡 Hint';
+        captionText = '💡 Hint';
       }
     } else {
       captionText = `${entry.chars.length} shkronja · ${fmt(entry.chars.length * 20)} PK`;
@@ -637,8 +707,10 @@
 
     if (!top.length) {
       const empty = makeEl('div', 't3 t3-empty');
+      const rank = makeEl('div', 't3-rank');
+      rank.innerHTML = `${UI_SVGS['🏆']} TOP 3`;
       empty.append(
-        makeEl('div', 't3-rank', '🏆 TOP 3'),
+        rank,
         makeEl('div', 't3-name', 'Bëhu i pari në koment!')
       );
       el.top3.appendChild(empty);
@@ -646,12 +718,14 @@
       return;
     }
 
-    const ranks = ['👑 #1', '#2', '#3'];
+    const ranks = [`${UI_SVGS['👑']} #1`, '#2', '#3'];
 
     for (let i = 0; i < 3; i++) {
       const p = top[i];
       const card = makeEl('div', `t3${i === 0 && p ? ' first' : ''}`);
-      const rank = makeEl('div', 't3-rank', ranks[i]);
+      const rank = makeEl('div', 't3-rank');
+      if (i === 0) rank.innerHTML = ranks[0];
+      else rank.textContent = ranks[i];
       const name = makeEl('div', 't3-name', p ? `@${p.user}` : '—');
       const score = makeEl('div', 't3-score', p ? `${fmt(p.score)} PK` : '0');
       if (p && state.topUsers[i] !== p.user) {
@@ -686,7 +760,10 @@
       const chip = makeEl('div', 'gift-chip');
       const text = makeEl('span', 'gift-text');
       text.append(makeEl('b', '', g.name), makeEl('small', '', g.effect));
-      chip.append(makeEl('span', 'gift-emoji', g.emoji), text);
+      const ico = makeEl('span', 'gift-emoji');
+      if (GIFT_SVGS[g.id]) ico.innerHTML = GIFT_SVGS[g.id];
+      else ico.textContent = g.emoji;
+      chip.append(ico, text);
       el.giftLegend.appendChild(chip);
     });
 
@@ -825,7 +902,7 @@
     const duration = opts.ms || CFG.resultMs;
     const label = opts.nextLabel || 'Raundi tjetër në';
 
-    el.overlayEmoji.textContent = emoji;
+    renderIcon(el.overlayEmoji, emoji);
     el.overlayTitle.textContent = title;
     el.overlayList.textContent = '';
     for (const row of rows) {
@@ -954,6 +1031,10 @@
     entry.finder = user || '';
     entry.points = Math.max(0, Math.round(points || 0));
 
+    // Measure before mutating DOM to avoid a forced synchronous layout reflow.
+    const node = entry.golden ? el.goldenCard : state.wordEls.get(entry.id);
+    const pt = stagePoint(node);
+
     // only the freshly found word flips; previously solved tiles stay still
     state.animateId = entry.id;
     if (entry.golden) renderGolden();
@@ -964,16 +1045,14 @@
     renderQuickWords();
     renderTop3();
 
-    const node = entry.golden ? el.goldenCard : state.wordEls.get(entry.id);
     if (entry.golden) {
-      const pt = stagePoint(node);
       fx.spawn(pt.x, pt.y, {
-        count: 40,
+        count: 26,
         power: 18,
         colors: ['#fde047', '#fbbf24', '#f59e0b', '#fff7cc', '#ffffff']
       });
     } else {
-      burstAt(node, 20);
+      fx.spawn(pt.x, pt.y, { count: 16, power: 14 });
     }
     traceChars(entry.chars);
     SFX.playWordFound(entry.golden, false);
@@ -1180,8 +1259,12 @@
     } else if (gift.id === 'song') {
       nextSong(user, combo);
     } else if (gift.id === 'hint') {
-      const got = revealLetters(2 * Math.min(times, 3));
-      announce('⚡', `+${got || 2} SHKRONJA · @${user}`, 'gift', 3200);
+      const count = 2 * Math.min(times, 2);
+      let revealed = 0;
+      for (let i = 0; i < count; i++) {
+        if (revealWord(user)) revealed += 1;
+      }
+      announce('🚀', `+${revealed || 2} FJALË · @${user}`, 'gift', 3200);
     } else if (gift.id === 'eagle') {
       startEagle(user, combo);
     } else {
@@ -1221,11 +1304,11 @@
     state.vip = user;
     flash('flash-gold');
     shake();
-    burstAt(el.goldenCard, 20, '🦅');
+    burstAt(el.goldenCard, 18, '🫰');
     bigConfetti();
     SFX.playNewKing();
     revealWord(user);
-    announce('🦅', `3X VIP 45 SEKONDA · @${user}${combo}`, 'gold', 4200);
+    announce('🫰', `3X VIP 45 SEKONDA · @${user}${combo}`, 'gold', 4200);
     renderMult();
   }
 
@@ -1772,7 +1855,7 @@
         words: p.words,
         team: p.team
       })),
-      cta: { icon: el.ctaIcon.textContent, text: el.ctaText.textContent, kind: ctaKind },
+      cta: { icon: el.ctaIcon.dataset.icon || el.ctaIcon.textContent, text: el.ctaText.textContent, kind: ctaKind },
       overlay: {
         show: el.overlay.classList.contains('show'),
         emoji: el.overlayEmoji.textContent,
@@ -1890,7 +1973,7 @@
 
     const cta = snapshot.cta || {};
     el.ctaBar.className = `cta ${cta.kind || 'idle'}`;
-    el.ctaIcon.textContent = cta.icon || '💬';
+    renderIcon(el.ctaIcon, cta.icon || '💬');
     el.ctaText.textContent = cta.text || '';
 
     const overlay = snapshot.overlay || {};
@@ -1970,21 +2053,8 @@
     }
     window.addEventListener('resize', fitStage);
 
+    // Rounds do not expire on a timer — they only end when the board is completed.
     setInterval(() => {
-      if (state.phase !== 'playing') {
-        renderMult();
-        return;
-      }
-      const left = Math.max(0, Math.ceil((state.roundEndsAt - Date.now()) / 1000));
-      if (left !== state.timeLeft) {
-        state.timeLeft = left;
-        renderTimer();
-        if (left > 0 && left <= 5 && left !== state.lastTickSec) {
-          state.lastTickSec = left;
-          SFX.playTick();
-        }
-      }
-      if (left === 0) endRound('time');
       renderMult();
     }, 500);
 

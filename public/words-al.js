@@ -82,7 +82,7 @@
       goldens: ['DETARI', 'DRITË', 'VLERAT', 'LETRA'],
       bonus: [
         'DETAR', 'DETI', 'DRITA', 'DITË', 'VERË', 'VLERA', 'VLERË', 'LETËR',
-        'TELA', 'TELË', 'TELI', 'TAVË', 'DERË', 'DERA',
+        'TELA', 'TELI', 'TAVË', 'DERË', 'DERA',
         'DELE', 'DELET', 'DATË', 'DIETA', 'LIDER', 'IDE', 'IDEAL', 'ELITË',
         'LIRA', 'LIRË', 'VATËR', 'TREVA', 'LARTË', 'TRI', 'ARË',
         'ARTË', 'ARTI', 'VILË', 'VILAT', 'VELAT', 'ATI', 'DITAR', 'DELTA',
@@ -111,7 +111,7 @@
       letters: ['K', 'Ë', 'N', 'G', 'A', 'V', 'L', 'L', 'E'],
       words: [
         'LEK', 'KALË', 'VLEN', 'KËNGË', 'KËNGA', 'VËLLA', 'VALLE',
-        'LËNG', 'LALE', 'KANË', 'VELA', 'VALË', 'LEVË', 'LEGEN', 'NGEL',
+        'LËNG', 'LALË', 'KANË', 'VELA', 'VALË', 'LEVË', 'LEGEN', 'NGEL',
         'NGA', 'LAG', 'VËNË', 'LËNË', 'VELË',
         'NGELA', 'LEKË'
       ],
@@ -125,9 +125,9 @@
       words: [
         'NATË', 'DERË', 'MEND', 'NDER', 'EMËR', 'ZEMËR', 'ZEMRA', 'EMRAT',
         'ZEMRAT', 'ARTË', 'DERA', 'NETË', 'ERË', 'ARMË', 'DËM', 'TËRË',
-        'DERAZË', 'MËZ', 'MARTË', 'DRE', 'DET', 'ZËRA'
+        'MËZ', 'MARTË', 'DRE', 'DET', 'ZËRA'
       ],
-      goldens: ['ZEMRAT', 'ZEMRA', 'ZEMËR', 'DERAZË'],
+      goldens: ['ZEMRAT', 'ZEMRA', 'ZEMËR', 'EMRAT'],
       bonus: [
         'ZËRAT', 'DËMET', 'MËZA', 'MËZAT', 'ZAR', 'MEZE',
         'MEZET', 'MAT', 'NDARË', 'ARË', 'ART', 'ZËNË', 'ATË'
@@ -140,13 +140,13 @@
       words: [
         'ORA', 'TOKA', 'NATA', 'ARKA', 'VOTA', 'KOT', 'ORTAK', 'TRIO',
         'AKTOR', 'KOVA', 'TON', 'NOTA', 'KINO', 'KROI', 'TANI', 'ATA',
-        'ATO', 'ATI', 'ARI', 'ART', 'TRI', 'TANK', 'KRONA', 'VATAN',
-        'RAKI', 'AVOKAT', 'NOTAR', 'KONTRA', 'KARTON', 'TIRANA'
+        'ATO', 'ATI', 'ARI', 'ART', 'TRI', 'TANK', 'VATAN',
+        'RAKI', 'AVOKAT', 'NOTAR', 'KONTRA', 'KARTON', 'AKTORI', 'NOTARI', 'TIRANA'
       ],
-      goldens: ['TIRANA', 'KARTON', 'AVOKAT', 'KRONA'],
+      goldens: ['TIRANA', 'KARTON', 'AVOKAT', 'NOTARI'],
       bonus: [
-        'ARKAT', 'AKTORI', 'NOTARI', 'AVOKATI', 'KORITA', 'IKONA', 'IKONAT',
-        'KORI', 'KOVAT', 'ARTI', 'VATANI', 'RAKIA', 'KRONAT', 'ATAK'
+        'ARKAT', 'AVOKATI', 'KORITA', 'IKONA', 'IKONAT',
+        'KORI', 'KOVAT', 'ARTI', 'VATANI', 'RAKIA', 'ATAK'
       ]
     },
     {
@@ -169,14 +169,14 @@
       category: 'Sporti & Kampionët ⚽',
       letters: ['F', 'I', 'T', 'O', 'R', 'E', 'G', 'L', 'A'],
       words: [
-        'FAT', 'GOL', 'LIGA', 'GARË', 'GOLI', 'FORTË', 'GOLFI', 'GLORIA',
+        'FAT', 'GOL', 'LIGA', 'GARË', 'GOLI', 'FORTË', 'GOLFI', 'FLOTA',
         'LART', 'TIFO', 'GOLF', 'ART', 'ARTI', 'LOT', 'LOTI', 'FLET',
         'FLORA', 'GATI', 'TREG', 'TRI', 'TRE',
-        'TROFE', 'GOTA', 'FOTEL', 'GOLAT', 'TRAG', 'FITORE'
+        'TROFE', 'GOTA', 'FILTRA', 'GOLAT', 'FITORE'
       ],
-      goldens: ['FITORE', 'GLORIA', 'FORTË', 'TROFE'],
+      goldens: ['FITORE', 'FILTRA', 'FORTË', 'TROFE'],
       bonus: [
-        'FLETA', 'FOTELI', 'FLE', 'FLI', 'GAFË',
+        'FLETA', 'LIGAT', 'FLE', 'FLI', 'GAFË',
         'GOTË', 'LETRA', 'LIRË', 'LIRA', 'ORA', 'ORË', 'LAG'
       ]
     },
@@ -187,7 +187,7 @@
       words: [
         'RRI', 'TRIM', 'MAMI', 'MIRË', 'EMRI', 'TRIMA', 'MARRË', 'MËRGIM',
         'EMRA', 'GËRMA', 'ART', 'ARMË', 'MAT', 'MIT', 'GRAM', 'MIRA',
-        'RITËM', 'GRIMË', 'MARTIR', 'TREMA', 'RIMA', 'RIMË', 'MARTE',
+        'RITËM', 'GRIMË', 'MARTIR', 'TREMA', 'RIMA', 'RIMË', 'MARTË',
         'TREG', 'TRI', 'TRE', 'MARR', 'GËRMAT', 'GËRMIM', 'MARRIM',
         'RRIT', 'MËRGIMTAR'
       ],
@@ -200,14 +200,14 @@
       letters: ['D', 'A', 'S', 'H', 'U', 'R', 'I', 'J', 'Ë'],
       words: [
         'DUA', 'UJË', 'DRU', 'ERA', 'RUAJ', 'DUAJ', 'DASHI', 'SHUAJ',
-        'DASHUR', 'DHE', 'DHEU', 'DUAR', 'AJËR', 'AJRI', 'AUR', 'DIJE',
-        'DJE', 'RASHË', 'SHIJ', 'UJI', 'URË', 'URA', 'SHIU',
+        'DASHUR', 'DHE', 'DHEU', 'DUAR', 'AJËR', 'AJRI', 'HUAJ', 'DIJE',
+        'DJE', 'RASHË', 'UJI', 'URË', 'URA', 'SHIU',
         'SHI', 'HIR', 'DASH', 'ARI', 'ARË', 'DASHURI'
       ],
       goldens: ['DASHURI', 'DASHUR', 'DASHI', 'SHUAJ'],
       bonus: [
         'DUSH', 'SHUAR', 'SAJ', 'ISHA', 'ISH', 'HUA',
-        'DHI', 'DHIA', 'AURI'
+        'DHI', 'DHIA', 'SHIJA'
       ]
     },
     {
@@ -230,7 +230,7 @@
         'HAP', 'ÇATI', 'SHIT', 'PRIT', 'SHPIRT', 'SHTËPI', 'TRASHË', 'ÇARË',
         'ÇIP', 'ÇEP', 'ÇEPI', 'PRISH', 'PISHË', 'HAPI', 'PARË', 'PASHË',
         'ART', 'ARTË', 'PRITA', 'ARË', 'ÇARSHI', 'ÇAST', 'ÇASTI', 'ÇETA',
-        'TASH', 'TEH', 'TRE', 'TRI', 'PRA', 'PËR', 'PAS', 'HIC'
+        'TASH', 'TEH', 'TRE', 'TRI', 'PRA', 'PËR', 'PAS', 'HIÇ'
       ],
       goldens: ['SHPIRT', 'ÇARSHI', 'SHTËPI', 'TRASHË'],
       bonus: ['SHI', 'SITË', 'SITA', 'PSE', 'ATË', 'ATI', 'ARI']
@@ -244,7 +244,7 @@
         'BËRA', 'LIS', 'LESH', 'LEK', 'LARË', 'BARK',
         'BAKËR', 'BAKRI', 'KALË', 'KALI', 'KRAH', 'KRAHË', 'HARK', 'ARKË',
         'HIR', 'ISH', 'ISHA', 'RASHË', 'SHI', 'SHIRA', 'LIRA', 'LIRË',
-        'BAR', 'BARI', 'BIR', 'BIRË', 'BIRA', 'LËR', 'LËRI'
+        'BAR', 'BARI', 'LËR', 'LËRI'
       ],
       goldens: ['LIBËR', 'LIBRA', 'KLASË', 'LIRË'],
       bonus: []
@@ -258,7 +258,7 @@
         'ARË', 'PËR', 'PRA', 'KALË', 'PRES', 'PREK', 'PREKA', 'PORT',
         'PORTA', 'KARTË', 'KAROTË', 'KOT', 'KOS', 'KRAP', 'LAK', 'LAKËR',
         'LARË', 'LEK', 'LOT', 'ORA', 'ORË', 'ORËT',
-        'PAK', 'PALË', 'PARË', 'PARK', 'PAS', 'POR', 'SAPË', 'SOT',
+        'PAK', 'PALË', 'PARË', 'PARK', 'PAS', 'POR', 'KAPË', 'SOT',
         'SPORT', 'SPORTE', 'STOK', 'STOP', 'TAPË', 'TEK', 'TOP', 'TOPA', 'TRE'
       ],
       goldens: ['KAROTË', 'LAKËR', 'PORTA', 'KOSAT'],
@@ -272,7 +272,7 @@
         'AVION', 'TREN', 'TRENI', 'VIT', 'VITE', 'VERA', 'VOTA', 'NOTA',
         'NOTARI', 'NIS', 'NISA', 'SOT', 'TANI', 'TON', 'TONI', 'TRI',
         'TRIO', 'TRON', 'TRONI', 'TRE', 'ORA', 'OSE', 'ARI', 'ART',
-        'ARTI', 'ATI', 'ATO', 'SITA', 'TIRAN', 'RAST', 'RASTI'
+        'ARTI', 'ATI', 'ATO', 'SITA', 'RAST', 'RASTI'
       ],
       goldens: ['AVION', 'TREN', 'TRENI', 'NOTARI'],
       bonus: []
@@ -287,7 +287,7 @@
         'PRET', 'TAPË', 'TEK', 'TOKA', 'TOP', 'TOPA', 'TRE',
         'TREN', 'TRON', 'TURP', 'KUR', 'KURA', 'KURAT', 'KURË', 'KAT',
         'KATE', 'KATËR', 'KARTË', 'KAROTË', 'KANË', 'KAP', 'KOT', 'KRAP',
-        'NATË', 'NUK', 'TON', 'URA', 'URË', 'URAT', 'URTË', 'AUR',
+        'NATË', 'NUK', 'TON', 'URA', 'URË', 'URAT', 'URTË', 'KAPË',
         'ART', 'ARTË', 'ARË', 'ATË', 'ATO', 'ANË', 'ANËT', 'AUTO', 'AUTOR'
       ],
       goldens: ['PUNËTOR', 'PUNË', 'AUTOR', 'PORTA'],
@@ -298,9 +298,9 @@
       category: 'Lojërat & Argëtimi 🎲',
       letters: ['L', 'O', 'J', 'Ë', 'R', 'A', 'T', 'I', 'M'],
       words: [
-        'LOJË', 'LOJA', 'LOJRA', 'LOJRAT', 'LOJTAR', 'LOJTARI', 'LOJTARE',
-        'MARTE', 'MIRA', 'MIRË', 'MIRAT',
-        'MIT', 'MOT', 'MOTI', 'MOTRA', 'MOTËR', 'MOLA', 'MOLË', 'MOLAT',
+        'LOJË', 'LOJA', 'LOJËRA', 'LOJËRAT', 'LOJTAR', 'LOJTARI', 'LOJTARE',
+        'MARTË', 'MIRA', 'MIRË', 'ROL', 'ROLI',
+        'MIT', 'MOT', 'MOTI', 'MOTRA', 'MOTËR',
         'LOT', 'LOTI', 'LARË', 'LART', 'LARTË', 'LIRA', 'LIRË',
         'LETRA', 'RIMA', 'RIMË', 'RIMAT', 'RITËM', 'ROJA', 'ROJË', 'ROJAT',
         'TEMA', 'TREMA', 'TRI', 'TRIO', 'TRIM', 'TRIMA',
@@ -308,7 +308,7 @@
         'AJËR', 'AJRI', 'JETA', 'ARI', 'ART', 'ARTI', 'ARË', 'ATË', 'ATI',
         'ATO', 'MOJ'
       ],
-      goldens: ['LOJTARI', 'LOJTAR', 'LOJRA', 'LOJË'],
+      goldens: ['LOJTARI', 'LOJTAR', 'LOJËRA', 'LOJË'],
       bonus: []
     },
     {
@@ -331,11 +331,11 @@
       category: 'Rrobat & Moda 👗',
       letters: ['R', 'R', 'O', 'B', 'A', 'T', 'Ë', 'S', 'H'],
       words: [
-        'RROBA', 'RROBAT', 'RROBË', 'ROBA', 'ROBË', 'ROBAT', 'RROTA',
+        'RROBA', 'RROBAT', 'RROBË', 'RROTA',
         'RROTË', 'RRETH', 'RRAH', 'RAST', 'ROSA', 'ROSË', 'ROSAT',
         'HERA', 'HARTË', 'HAS', 'BART', 'BESA', 'BESAT',
         'BËRA', 'BOTA', 'BOTË', 'BORA', 'BORË', 'BOSH',
-        'BROSH', 'BROSHË', 'BROSHA', 'TERR', 'TESHA', 'TRE'
+        'BROSHË', 'BROSHA', 'TERR', 'TESHA', 'TRE'
       ],
       goldens: ['RROBAT', 'BROSHË', 'RROBA', 'TESHA'],
       bonus: []
@@ -346,10 +346,10 @@
       letters: ['K', 'A', 'F', 'S', 'H', 'Ë', 'T', 'I', 'R'],
       words: [
         'KAFSHË', 'KAFSHËT', 'FSHAT', 'FSHATI', 'FIK', 'FIS', 'FISE', 'FISET',
-        'FAT', 'FATI', 'FARË', 'FASHË', 'FAKS', 'FAKSI', 'FRIK', 'FRIKA',
+        'FAT', 'FATI', 'FARË', 'FASHË', 'FAKS', 'FAKSI', 'FRIKA',
         'HARK', 'HARTË', 'HAS', 'HASI', 'HAK', 'HIR', 'HIT',
         'HEKTAR', 'KAFE', 'KARTË', 'KAT', 'KATE', 'KATËR', 'KATI', 'KISHA',
-        'KISHË', 'KITAR', 'KITARË', 'KRAH', 'KRAHË', 'KRIS', 'RAKI',
+        'KISHË', 'KITARË', 'KRAH', 'KRAHË', 'KRIS', 'RAKI',
         'RASHË', 'SHEF', 'SHEFI', 'SHI', 'SHIRA', 'SHIT', 'SITA', 'TEH',
         'TEK', 'TRE', 'TRI'
       ],
@@ -389,13 +389,13 @@
       category: 'Lulet & Bimët 🌸',
       letters: ['L', 'U', 'L', 'E', 'T', 'Ë', 'R', 'I', 'A'],
       words: [
-        'LULË', 'LULET', 'TULLË', 'TELA', 'TELË', 'TELI',
+        'LULE', 'LULET', 'TULLË', 'TELA', 'TELI',
         'TEL', 'TËRË', 'TRU', 'URA', 'URË', 'URAT', 'URTË', 'LARË', 'LART',
         'LARTË', 'LETËR', 'LETRA', 'LIRA', 'LIRË', 'ARI', 'ART', 'ARTI',
-        'ARTË', 'ARË', 'ATË', 'ATI', 'AUR', 'AURI', 'RALI', 'TRE', 'TRI',
+        'ARTË', 'ARË', 'ATË', 'ATI', 'TRE', 'TRI', 'LULETAR', 'LULETARI',
         'LËR', 'LËRI'
       ],
-      goldens: ['LULET', 'LULË', 'TULLË', 'LETËR'],
+      goldens: ['LULET', 'LULE', 'LULETAR', 'LETËR'],
       bonus: []
     },
     {
@@ -404,10 +404,11 @@
       letters: ['D', 'Ë', 'B', 'O', 'R', 'Ë', 'S', 'H', 'I'],
       words: [
         'DËBORË', 'DËSHIRË', 'BORË', 'SHI', 'ERË', 'ORË', 'DORË',
-        'ROSË', 'BRODË', 'ISH', 'HIR',
-        'BOSH', 'HERË', 'DHE', 'DHI'
+        'ROSË', 'ISH', 'HIR',
+        'BOSH', 'HERË', 'DHE', 'DHI',
+        'BISHË', 'BREDH', 'BREDHI', 'DORËS', 'BORËS', 'SHËRO'
       ],
-      goldens: ['DËBORË', 'DËSHIRË', 'BORË', 'BRODË'],
+      goldens: ['DËBORË', 'DËSHIRË', 'BORË', 'DORË'],
       bonus: []
     }
   ];
@@ -481,10 +482,11 @@
     {
       id: 'theme',
       emoji: '🌹',
-      name: 'Rozë',
+      name: 'Rose · Trëndafil',
       effect: 'Ndryshon ngjyrat e lojës',
       points: 30,
-      aliases: ['rose', 'roze', 'ngjyr', 'color', 'background']
+      coins: 1,
+      aliases: ['rose', 'roze', 'trendafil', 'trëndafil', 'ngjyr', 'color', 'background']
     },
     {
       id: 'song',
@@ -492,30 +494,33 @@
       name: 'TikTok',
       effect: 'Ndryshon këngën e lojës',
       points: 50,
+      coins: 1,
       aliases: ['tiktok', 'music', 'song', 'keng', 'kenge']
     },
     {
       id: 'hint',
-      emoji: '⚡',
-      name: 'Rrufe',
-      effect: 'Zbulon 2 shkronja të fshehura',
-      points: 60,
-      aliases: ['finger', 'heart', 'donut', 'ice', 'lightning', 'hint', 'rrufe', 'zemer']
+      emoji: '🚀',
+      name: 'Rocket · Raketë',
+      effect: 'Zbulon 2 fjalë',
+      points: 100,
+      coins: 5,
+      aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe']
     },
     {
       id: 'eagle',
-      emoji: '🦅',
-      name: 'Shqiponjë',
+      emoji: '🫰',
+      name: 'Finger Heart · Zemër me gishta',
       effect: '3X pikë VIP 45s + 1 fjalë',
       points: 200,
-      aliases: ['eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj', 'elephant']
+      coins: 5,
+      aliases: ['finger heart', 'finger', 'heart', 'zemer', 'zemër', 'gisht', 'eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj', 'vip']
     }
   ];
 
   const TIPS = [
     ['💬', 'SHKRUAJ FJALËN NË KOMENT'],
     ['👑', 'GJEJ FJALËN E ARTË · 3X PK'],
-    ['❤️', '200+ LIKES = 1 SHKRONJË'],
+    ['❤️', '200+ LIKES = ZBULON 1 SHKRONJË'],
     ['🎁', 'DHURATA = HINT & 3X VIP'],
     ['⚡', 'FJALË BONUS = +25 PK'],
     ['🏆', 'TOP 3 FITOJNË ÇDO RAUND']

@@ -26,10 +26,10 @@ const DATA = globalThis.ALBANIAN_DATA || {};
 const GIFTS = Array.isArray(DATA.GIFTS) && DATA.GIFTS.length
   ? DATA.GIFTS
   : [
-      { id: 'theme', aliases: ['rose', 'roze', 'ngjyr', 'color'] },
+      { id: 'theme', aliases: ['rose', 'roze', 'trendafil', 'trëndafil', 'ngjyr', 'color'] },
       { id: 'song', aliases: ['tiktok', 'music', 'song', 'keng'] },
-      { id: 'hint', aliases: ['finger', 'heart', 'donut', 'ice', 'lightning', 'hint', 'rrufe'] },
-      { id: 'eagle', aliases: ['eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj'] }
+      { id: 'hint', aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe'] },
+      { id: 'eagle', aliases: ['finger heart', 'finger', 'heart', 'zemer', 'zemër', 'gisht', 'eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj', 'vip'] }
     ];
 
 const PORT = Number(process.env.PORT) || 3000;
