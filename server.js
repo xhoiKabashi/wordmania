@@ -15,6 +15,13 @@ const path = require('path');
 const os = require('os');
 const { URL } = require('url');
 
+let connector = null;
+try {
+  connector = require('tiktok-live-connector');
+} catch (err) {
+  /* optional dependency fallback */
+}
+
 // Load the shared game data (gift aliases live there, single source of truth)
 try {
   require('./public/words-al.js');
@@ -23,6 +30,7 @@ try {
 }
 
 const DATA = globalThis.ALBANIAN_DATA || {};
+const { createGameEngine } = require('./engine.js');
 const GIFTS = Array.isArray(DATA.GIFTS) && DATA.GIFTS.length
   ? DATA.GIFTS
   : [
@@ -36,7 +44,8 @@ const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const MUSIC_DIR = path.join(__dirname, 'music');
-const MAX_BODY = 32 * 1024;
+const TIKTOK_CONFIG_PATH = path.join(__dirname, '.tiktok-config.json');
+const MAX_BODY = 128 * 1024;
 const VERBOSE = process.env.VERBOSE === '1';
 
 const MIME_TYPES = {
@@ -93,9 +102,6 @@ function listMusicTracks() {
 /** @type {Map<number, http.ServerResponse>} */
 const sseClients = new Map();
 let nextClientId = 1;
-
-/** Latest mirrored game frame from the OBS page (for the phone viewer). */
-let latestSpectate = null;
 
 const LAN_DISABLED = ['127.0.0.1', 'localhost', '::1'].includes(HOST);
 
@@ -166,18 +172,23 @@ function broadcast(payload) {
   }
 }
 
+const gameEngine = createGameEngine({
+  data: DATA,
+  onBroadcast: broadcast
+});
+
 function broadcastLikes() {
   likeQueue.timer = null;
   if (likeQueue.pending <= 0) return;
   const count = Math.min(likeQueue.pending, 100000);
   likeQueue.pending = 0;
-  broadcast({ type: 'like', count, ts: Date.now() });
+  gameEngine.handleEvent({ type: 'like', count, ts: Date.now() });
 }
 
 function queueLike(count) {
   likeQueue.pending += count;
   if (!likeQueue.timer) {
-    likeQueue.timer = setTimeout(broadcastLikes, 120);
+    likeQueue.timer = setTimeout(broadcastLikes, 40);
   }
 }
 
@@ -193,7 +204,15 @@ function handleStream(req, res) {
 
   const id = nextClientId++;
   sseClients.set(id, res);
-  res.write(`data: ${JSON.stringify({ type: 'connected', clients: sseClients.size, ts: Date.now() })}\n\n`);
+  res.write(
+    `data: ${JSON.stringify({
+      type: 'connected',
+      clients: sseClients.size,
+      snapshot: gameEngine.getSnapshot(),
+      tiktok: getTikTokStatus(),
+      ts: Date.now()
+    })}\n\n`
+  );
 
   const heartbeat = setInterval(() => {
     if (!sseClients.has(id)) {
@@ -245,6 +264,7 @@ function normalizeType(raw) {
   if (['viewers', 'viewer', 'viewercount', 'audience'].includes(t)) return 'viewers';
   if (['join', 'member', 'enter', 'joined'].includes(t)) return 'join';
   if (['follow', 'follower', 'share', 'subscribe'].includes(t)) return 'follow';
+  if (['command', 'cmd', 'action'].includes(t)) return 'command';
   return '';
 }
 
@@ -252,7 +272,14 @@ function sanitizeEvent(input) {
   if (!input || typeof input !== 'object') return { error: 'Invalid payload' };
 
   const type = normalizeType(pickFirst(input.type, input.event, input.eventType, input.action));
-  if (!type) return { error: 'Invalid event type. Use comment, like, gift, viewers, join or follow.' };
+  if (!type) return { error: 'Invalid event type. Use comment, like, gift, viewers, join, follow or command.' };
+
+  if (type === 'command') {
+    const action = String(pickFirst(input.action, input.cmd, input.command, '')).trim();
+    if (!action) return { error: 'Invalid command action' };
+    const value = input.value !== undefined ? Number(input.value) : undefined;
+    return { event: { type: 'command', action, ...(Number.isFinite(value) ? { value } : {}), ts: Date.now() } };
+  }
 
   if (type === 'like') {
     const raw = Number(pickFirst(input.count, input.repeatCount, input.likeCount, input.likes, 1));
@@ -364,7 +391,7 @@ function publish(event) {
   if (event.type === 'like') {
     queueLike(event.count || 1);
   } else {
-    broadcast(event);
+    gameEngine.handleEvent(event);
   }
 
   if (VERBOSE) {
@@ -441,21 +468,367 @@ async function handleEventRequest(req, res) {
 
 async function handleSpectatePost(req, res) {
   try {
-    const body = await readBody(req);
-    const snapshot = JSON.parse(body);
-    if (!snapshot || typeof snapshot !== 'object' || !Array.isArray(snapshot.board) || !snapshot.golden) {
-      sendJson(res, 400, { ok: false, error: 'Invalid snapshot' });
-      return;
-    }
-
-    latestSpectate = { ...snapshot, ts: Date.now() };
-    broadcast({ type: 'spectate', snapshot: latestSpectate });
+    await readBody(req);
     sendJson(res, 200, { ok: true, clients: sseClients.size });
   } catch (err) {
     const tooLarge = err && err.message === 'Payload too large';
     sendJson(res, tooLarge ? 413 : 400, {
       ok: false,
       error: tooLarge ? 'Payload too large' : 'Invalid snapshot'
+    });
+  }
+}
+
+/* ---------------------------------------------------------------
+   TIKTOK LIVE ADAPTER
+   --------------------------------------------------------------- */
+
+const TikTokLiveConnection = connector?.TikTokLiveConnection || connector?.WebcastPushConnection;
+const WebcastEvent = connector?.WebcastEvent || {
+  CHAT: 'chat',
+  LIKE: 'like',
+  GIFT: 'gift',
+  FOLLOW: 'follow',
+  SHARE: 'share',
+  STREAM_END: 'streamEnd'
+};
+const ControlEvent = connector?.ControlEvent || { DISCONNECTED: 'disconnected', ERROR: 'error' };
+
+const tiktokState = {
+  connection: null,
+  connectionSeq: 0,
+  shouldRun: false,
+  username: '',
+  status: 'disconnected', // 'disconnected' | 'connecting' | 'connected' | 'error'
+  error: null,
+  connectedAt: null,
+  roomId: null,
+  reconnectTimer: null,
+  backoffMs: 3000,
+  lastTotalLikes: 0,
+  lastLikeLogAt: 0
+};
+
+function extractTikTokUser(data) {
+  const u = data?.user;
+  const userId = String(
+    u?.displayId || u?.uniqueId || data?.uniqueId || u?.id || u?.userId || data?.userId || ''
+  ).trim();
+  if (!userId) return null;
+  const nickname = String(u?.nickname || data?.nickname || userId).trim() || userId;
+  return { userId, nickname };
+}
+
+function mapTikTokChat(data) {
+  const user = extractTikTokUser(data);
+  const text = String(data?.content ?? data?.comment ?? '').trim();
+  if (!text) return null;
+  return {
+    user: user ? user.userId : 'Viewer',
+    nickname: user ? user.nickname : 'Viewer',
+    text
+  };
+}
+
+function mapTikTokLike(data) {
+  const user = extractTikTokUser(data);
+  const rawCount = data?.count ?? data?.likeCount;
+  const parsedCount = Number(rawCount);
+  const count = Number.isFinite(parsedCount) && parsedCount > 0 ? Math.round(parsedCount) : 0;
+  const totalLikes = Number(data?.total ?? data?.totalLikeCount ?? 0) || 0;
+  return {
+    user: user ? user.userId : 'Viewer',
+    count,
+    totalLikes
+  };
+}
+
+function computeLikeDelta(msg) {
+  let delta = msg.count;
+  const total = msg.totalLikes;
+  if (total > 0) {
+    if (tiktokState.lastTotalLikes === 0 && total - delta > 200) {
+      // Mid-stream join baseline: do not count pre-existing likes as new.
+      tiktokState.lastTotalLikes = total;
+    } else if (total > tiktokState.lastTotalLikes) {
+      const totalDelta = total - tiktokState.lastTotalLikes;
+      tiktokState.lastTotalLikes = total;
+      if (delta <= 0) delta = Math.min(100, totalDelta);
+    }
+  }
+  return delta > 0 ? delta : 1;
+}
+
+function mapTikTokGift(data) {
+  const user = extractTikTokUser(data);
+  const giftObj = data?.gift;
+  const ext = data?.extendedGiftInfo;
+  const legacy = data?.giftDetails;
+
+  const giftName = String(giftObj?.name || ext?.name || legacy?.giftName || data?.giftName || 'Gift');
+  const repeatCount = Math.max(1, Number(data?.repeatCount || 1) || 1);
+  const repeatEnd = Boolean(data?.repeatEnd);
+  const rawType = giftObj?.type ?? ext?.type ?? legacy?.giftType ?? data?.giftType;
+  const giftType = rawType !== undefined && rawType !== null ? Number(rawType) : (giftObj?.combo ? 1 : 0);
+
+  return {
+    user: user ? user.userId : 'Viewer',
+    giftName,
+    count: repeatCount,
+    repeatEnd,
+    giftType
+  };
+}
+
+function loadSavedTikTokUser() {
+  try {
+    const raw = fs.readFileSync(TIKTOK_CONFIG_PATH, 'utf8');
+    const parsed = JSON.parse(raw);
+    if (parsed && parsed.autoConnect === false) return '';
+    return String(parsed?.username || '').replace(/^@+/, '').trim();
+  } catch {
+    return '';
+  }
+}
+
+function saveTikTokConfig(username, autoConnect) {
+  try {
+    const clean = String(username || '').replace(/^@+/, '').trim();
+    fs.writeFileSync(
+      TIKTOK_CONFIG_PATH,
+      JSON.stringify({ username: clean, autoConnect: Boolean(autoConnect) }, null, 2) + '\n',
+      'utf8'
+    );
+  } catch {
+    /* ignore config write errors */
+  }
+}
+
+function getTikTokStatus() {
+  return {
+    status: tiktokState.status,
+    username: tiktokState.username,
+    roomId: tiktokState.roomId,
+    connectedAt: tiktokState.connectedAt,
+    error: tiktokState.error
+  };
+}
+
+function cleanupTikTokConnection() {
+  tiktokState.connectionSeq += 1;
+  if (tiktokState.reconnectTimer) {
+    clearTimeout(tiktokState.reconnectTimer);
+    tiktokState.reconnectTimer = null;
+  }
+  if (tiktokState.connection) {
+    const oldConn = tiktokState.connection;
+    tiktokState.connection = null;
+    try {
+      oldConn.removeAllListeners?.();
+      oldConn.disconnect?.();
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function disconnectTikTokLive() {
+  tiktokState.shouldRun = false;
+  cleanupTikTokConnection();
+  const wasConnected = tiktokState.status === 'connected';
+  tiktokState.status = 'disconnected';
+  tiktokState.error = null;
+  tiktokState.connectedAt = null;
+  tiktokState.roomId = null;
+  tiktokState.lastTotalLikes = 0;
+  tiktokState.backoffMs = 3000;
+  if (wasConnected) {
+    console.log(`[TikTok] U shkëput nga @${tiktokState.username}`);
+  }
+  broadcast({ type: 'tiktok_status', ...getTikTokStatus() });
+}
+
+function scheduleTikTokReconnect(username, seq) {
+  if (!tiktokState.shouldRun || seq !== tiktokState.connectionSeq) return;
+  if (tiktokState.reconnectTimer) clearTimeout(tiktokState.reconnectTimer);
+  const waitMs = tiktokState.backoffMs;
+  tiktokState.backoffMs = Math.min(15000, tiktokState.backoffMs * 2);
+  console.log(`[TikTok] Rilidhje me @${username} pas ${Math.round(waitMs / 1000)}s...`);
+  tiktokState.reconnectTimer = setTimeout(() => {
+    tiktokState.reconnectTimer = null;
+    if (tiktokState.shouldRun && tiktokState.username === username && seq === tiktokState.connectionSeq) {
+      connectTikTokLive(username, { isReconnect: true }).catch(() => {});
+    }
+  }, waitMs);
+}
+
+async function connectTikTokLive(rawUsername, opts = {}) {
+  if (!TikTokLiveConnection) {
+    throw new Error('tiktok-live-connector nuk është i instaluar në server.');
+  }
+
+  const username = String(rawUsername || '').replace(/^@+/, '').trim();
+  if (!username) {
+    throw new Error('Emri i llogarisë së TikTok nuk mund të jetë bosh.');
+  }
+
+  cleanupTikTokConnection();
+  const seq = tiktokState.connectionSeq;
+
+  tiktokState.shouldRun = true;
+  tiktokState.username = username;
+  tiktokState.status = 'connecting';
+  tiktokState.error = null;
+  tiktokState.connectedAt = null;
+  tiktokState.roomId = null;
+  tiktokState.lastTotalLikes = 0;
+  if (!opts.isReconnect) tiktokState.backoffMs = 3000;
+  broadcast({ type: 'tiktok_status', ...getTikTokStatus() });
+  console.log(`[TikTok] Duke u lidhur me @${username}...`);
+
+  const signApiKey = process.env.EULER_API_KEY || process.env.SIGN_API_KEY || undefined;
+  const conn = new TikTokLiveConnection(username, {
+    ...(signApiKey ? { signApiKey } : {}),
+    enableExtendedGiftInfo: false,
+    processInitialData: false,
+    fetchRoomInfoOnConnect: true
+  });
+  tiktokState.connection = conn;
+
+  conn.on(WebcastEvent.CHAT || 'chat', (data) => {
+    if (seq !== tiktokState.connectionSeq) return;
+    const msg = mapTikTokChat(data);
+    if (!msg) return;
+    publish({
+      type: 'comment',
+      user: msg.user,
+      text: msg.text
+    });
+    console.log(`[TikTok Chat] @${msg.user}: "${msg.text}"`);
+  });
+
+  conn.on(WebcastEvent.LIKE || 'like', (data) => {
+    if (seq !== tiktokState.connectionSeq) return;
+    const msg = mapTikTokLike(data);
+    if (!msg) return;
+    const count = computeLikeDelta(msg);
+    publish({
+      type: 'like',
+      count
+    });
+    const now = Date.now();
+    if (VERBOSE || now - tiktokState.lastLikeLogAt > 4000) {
+      tiktokState.lastLikeLogAt = now;
+      console.log(`[TikTok Like] +${count} nga @${msg.user} (total: ${stats.likes})`);
+    }
+  });
+
+  conn.on(WebcastEvent.GIFT || 'gift', (data) => {
+    if (seq !== tiktokState.connectionSeq) return;
+    const msg = mapTikTokGift(data);
+    if (!msg) return;
+    if (msg.giftType === 1 && !msg.repeatEnd) return;
+    publish({
+      type: 'gift',
+      user: msg.user,
+      giftName: msg.giftName,
+      giftType: mapGift(msg.giftName),
+      count: msg.count
+    });
+    console.log(`[TikTok Dhuratë] @${msg.user} dërgoi ${msg.count}x ${msg.giftName}`);
+  });
+
+  conn.on(WebcastEvent.FOLLOW || 'follow', (data) => {
+    if (seq !== tiktokState.connectionSeq) return;
+    const user = extractTikTokUser(data);
+    if (user) {
+      publish({ type: 'follow', user: user.userId });
+    }
+  });
+
+  conn.on(WebcastEvent.SHARE || 'share', (data) => {
+    if (seq !== tiktokState.connectionSeq) return;
+    const user = extractTikTokUser(data);
+    if (user) {
+      publish({ type: 'share', user: user.userId });
+    }
+  });
+
+  conn.on(ControlEvent.ERROR || 'error', (err) => {
+    if (seq !== tiktokState.connectionSeq) return;
+    const message = err?.exception?.message || err?.info || err?.message || String(err);
+    console.warn(`[TikTok Gabim] @${username}:`, message);
+  });
+
+  conn.on(ControlEvent.DISCONNECTED || 'disconnected', () => {
+    if (seq !== tiktokState.connectionSeq) return;
+    console.log(`[TikTok] U shkëput nga @${username}.`);
+    tiktokState.connection = null;
+    tiktokState.status = 'disconnected';
+    broadcast({ type: 'tiktok_status', ...getTikTokStatus() });
+    scheduleTikTokReconnect(username, seq);
+  });
+
+  conn.on(WebcastEvent.STREAM_END || 'streamEnd', () => {
+    if (seq !== tiktokState.connectionSeq) return;
+    console.log(`[TikTok] Live stream përfundoi për @${username}.`);
+    tiktokState.shouldRun = false;
+    cleanupTikTokConnection();
+    tiktokState.status = 'disconnected';
+    broadcast({ type: 'tiktok_status', ...getTikTokStatus() });
+  });
+
+  try {
+    const roomState = await conn.connect();
+    if (seq !== tiktokState.connectionSeq || !tiktokState.shouldRun) {
+      try {
+        conn.removeAllListeners?.();
+        conn.disconnect?.();
+      } catch {
+        /* ignore */
+      }
+      return roomState;
+    }
+    tiktokState.status = 'connected';
+    tiktokState.backoffMs = 3000;
+    tiktokState.connectedAt = Date.now();
+    tiktokState.roomId = roomState?.roomId || null;
+    saveTikTokConfig(username, true);
+    console.log(`[TikTok] ✓ E lidhur me sukses me @${username} (Room ID: ${roomState?.roomId || 'OK'})`);
+    broadcast({ type: 'tiktok_status', ...getTikTokStatus() });
+    return roomState;
+  } catch (err) {
+    if (seq !== tiktokState.connectionSeq) throw err;
+    tiktokState.connection = null;
+    tiktokState.status = 'error';
+    tiktokState.error = err.message || String(err);
+    console.error(`[TikTok] Dështoi lidhja me @${username}:`, tiktokState.error);
+    broadcast({ type: 'tiktok_status', ...getTikTokStatus() });
+    if (opts.isReconnect || opts.autoRetry) {
+      scheduleTikTokReconnect(username, seq);
+    } else {
+      tiktokState.shouldRun = false;
+    }
+    throw err;
+  }
+}
+
+async function handleTikTokConnect(req, res) {
+  try {
+    const body = await readBody(req);
+    const payload = parsePayload(body, req.headers['content-type']);
+    const username = String(payload.username || payload.user || '').trim();
+    if (!username) {
+      sendJson(res, 400, { ok: false, error: 'Mungon emri i përdoruesit të TikTok.' });
+      return;
+    }
+    saveTikTokConfig(username, true);
+    await connectTikTokLive(username, { autoRetry: Boolean(payload.autoRetry) });
+    sendJson(res, 200, { ok: true, ...getTikTokStatus() });
+  } catch (err) {
+    sendJson(res, 400, {
+      ok: false,
+      error: err.message || 'Dështoi lidhja me TikTok Live. Sigurohuni që llogaria është LIVE.'
     });
   }
 }
@@ -646,6 +1019,7 @@ const server = http.createServer((req, res) => {
       gifts: stats.gifts,
       rejected: stats.rejected,
       lastEventAt: stats.lastEventAt,
+      tiktok: getTikTokStatus(),
       recent: stats.recent
     });
     return;
@@ -663,7 +1037,7 @@ const server = http.createServer((req, res) => {
 
   if (pathname === '/api/spectate') {
     if (req.method === 'GET') {
-      sendJson(res, 200, { snapshot: latestSpectate });
+      sendJson(res, 200, { snapshot: gameEngine.getSnapshot() });
       return;
     }
     if (req.method === 'POST') {
@@ -676,6 +1050,23 @@ const server = http.createServer((req, res) => {
 
   if (pathname === '/api/stream' && req.method === 'GET') {
     handleStream(req, res);
+    return;
+  }
+
+  if (pathname === '/api/tiktok/status' && req.method === 'GET') {
+    sendJson(res, 200, { ok: true, ...getTikTokStatus() });
+    return;
+  }
+
+  if (pathname === '/api/tiktok/connect' && req.method === 'POST') {
+    handleTikTokConnect(req, res);
+    return;
+  }
+
+  if (pathname === '/api/tiktok/disconnect' && req.method === 'POST') {
+    if (tiktokState.username) saveTikTokConfig(tiktokState.username, false);
+    disconnectTikTokLive();
+    sendJson(res, 200, { ok: true, ...getTikTokStatus() });
     return;
   }
 
@@ -705,6 +1096,18 @@ const server = http.createServer((req, res) => {
 server.keepAliveTimeout = 65000;
 server.headersTimeout = 70000;
 
+function resolveCliTikTokUser(argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const arg = String(argv[i] || '');
+    if (arg.startsWith('--user=')) return arg.slice(7).trim();
+    if (arg === '--user' && argv[i + 1]) return String(argv[i + 1]).trim();
+    if (!arg.startsWith('-') && arg.trim()) return arg.trim();
+  }
+  return (process.env.TIKTOK_USER || process.env.TIKTOK_USERNAME || '').trim();
+}
+
+const cliUser = resolveCliTikTokUser(process.argv.slice(2)) || loadSavedTikTokUser();
+
 server.listen(PORT, HOST, () => {
   const tracks = listMusicTracks();
   const net = networkInfo();
@@ -726,11 +1129,22 @@ server.listen(PORT, HOST, () => {
   if (net.addresses.length > 1) {
     console.log(`           ${net.addresses.slice(1).map((a) => a.phoneUrl).join('  ·  ')}`);
   }
+  if (cliUser) {
+    console.log(`  TikTok : Auto-lidhje me @${cliUser}...`);
+    connectTikTokLive(cliUser, { autoRetry: true }).catch((err) => {
+      console.log(`  TikTok : Nuk u lidh dot ende me @${cliUser} (${err.message}) — do të riprovojë automatikisht.`);
+    });
+  } else {
+    console.log(`  TikTok : JO I LIDHUR — hap http://localhost:${PORT}/ për t'u lidhur,`);
+    console.log(`           ose nis me: npm run start:win -- --user=USERNAME`);
+  }
   console.log('');
 });
 
 function shutdown() {
   console.log('\nDuke u mbyllur…');
+  gameEngine.destroy();
+  disconnectTikTokLive();
   for (const [id, res] of sseClients) {
     try {
       res.end();

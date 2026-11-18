@@ -4,11 +4,12 @@
   "description": "FJALËMANIA LIVE AL — an interactive 9:16 TikTok Live word game for the Albanian & diaspora market. Comments find words, likes reveal letters, gifts trigger power-ups.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "start:win": "node --preserve-symlinks --preserve-symlinks-main server.js",
+    "start": "node --preserve-symlinks server.js",
+    "start:win": "node --preserve-symlinks server.js",
     "firewall": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/open-firewall.ps1",
-    "check": "node scripts/verify-words.js && node --check server.js && node --check public/game.js && node --check public/audio.js && node --check public/words-al.js",
-    "check:words": "node scripts/verify-words.js"
+    "check": "node --preserve-symlinks scripts/verify-words.js && node --preserve-symlinks --check engine.js && node --preserve-symlinks --check server.js && node --preserve-symlinks --check public/game.js && node --preserve-symlinks --check public/audio.js && node --preserve-symlinks --check public/words-al.js",
+    "check:words": "node --preserve-symlinks scripts/verify-words.js",
+    "bridge": "node --preserve-symlinks scripts/tiktok-bridge.js"
   },
   "keywords": [
     "tiktok-live",
@@ -22,5 +23,8 @@
   "engines": {
     "node": ">=18"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "tiktok-live-connector": "^2.5.0"
+  }
 }

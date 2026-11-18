@@ -105,6 +105,7 @@
     <main class="stage-wrap" id="stageWrap">
       <div class="stage theme-kuqezi" id="stage" aria-label="FjalëMania Live">
         <div class="stage-bg"></div>
+        <div class="comment-backdrop" aria-hidden="true"></div>
         <canvas id="fxCanvas" class="fx-canvas" width="540" height="960" aria-hidden="true"></canvas>
         <div id="flashLayer" class="flash-layer" aria-hidden="true"></div>
 
@@ -140,6 +141,11 @@
             </div>
           </header>
 
+          <!-- TOP 3 LEADERBOARD (placed high, clear of TikTok comments) -->
+          <section class="top3-panel" aria-label="Top 3 lojtarët">
+            <div class="top3" id="top3Strip"></div>
+          </section>
+
           <!-- DYNAMIC CALLOUT / INSTRUCTION -->
           <div class="cta" id="ctaBar" role="status" aria-live="polite">
             <span class="cta-icon" id="ctaIcon">💬</span>
@@ -169,23 +175,10 @@
             <div class="letter-bank" id="letterBank"></div>
           </section>
 
-          <!-- GIFT CHEAT SHEET -->
-          <div class="gift-legend" id="giftLegend"></div>
-
-          <!-- FULL-WIDTH TOP 3 LEADERBOARD -->
-          <footer class="foot">
-            <div class="top3" id="top3Strip"></div>
-          </footer>
-        </div>
-
-        <!-- HOW TO PLAY (sits in TikTok's bottom UI area) -->
-        <div class="rules" aria-label="Rregullat e lojës">
-          <div class="rules-title"><svg class="ui-ico" aria-hidden="true"><use href="#ico-scroll"/></svg>SI TË LUAJ</div>
-          <div class="rules-grid">
-            <div class="rule"><span class="ico"><svg class="ui-ico" aria-hidden="true"><use href="#ico-chat"/></svg></span><span>Komento <b>fjalën</b></span></div>
-            <div class="rule"><span class="ico"><svg class="ui-ico" aria-hidden="true"><use href="#ico-heart"/></svg></span><span><b>200+ likes</b> = Zbulon 1 shkronjë</span></div>
-            <div class="rule"><span class="ico"><svg class="ui-ico" aria-hidden="true"><use href="#ico-gift"/></svg></span><span>Dhurata = <b>Hint / 3X</b></span></div>
-            <div class="rule"><span class="ico"><svg class="ui-ico" aria-hidden="true"><use href="#ico-crown"/></svg></span><span>Fjala e Artë = <b>3X</b></span></div>
+          <!-- BOTTOM ZONE: black comment area on left, gifts stacked on right -->
+          <div class="bottom-zone">
+            <div class="comment-space" aria-hidden="true"></div>
+            <div class="gift-legend" id="giftLegend"></div>
           </div>
         </div>
 
@@ -223,6 +216,20 @@
         <b id="bridgeText">Duke u lidhur…</b>
         <span class="spacer"></span>
         <span id="eventCounter">0 ngjarje</span>
+      </div>
+
+      <div class="studio-block" id="tiktokLiveBlock">
+        <label class="block-title">🔴 TikTok Live (Lidhu Këtu)</label>
+        <div class="row">
+          <input id="tiktokUserInput" class="input input-user" type="text" placeholder="@username" />
+          <button id="tiktokConnectBtn" class="btn btn-primary" type="button">Lidhu</button>
+          <button id="tiktokDisconnectBtn" class="btn btn-ghost" type="button" style="display:none;">Shkëputu</button>
+        </div>
+        <div class="bridge-status" id="tiktokStatusBadge" style="margin-top: 6px; padding: 7px 10px;">
+          <span class="status-dot" id="tiktokDot"></span>
+          <b id="tiktokStatusText">I shkëputur</b>
+        </div>
+        <p class="hint">Shkruaj username-in tënd të TikTok (p.sh. <code>andi_tirana</code>) kur je LIVE dhe kliko <b>Lidhu</b>. Komentet, likes dhe dhuratat lidhen menjëherë me lojën!</p>
       </div>
 
       <div class="studio-block">
