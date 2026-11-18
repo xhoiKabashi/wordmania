@@ -1375,7 +1375,7 @@
       });
 
     try {
-      const savedUser = localStorage.getItem('fjalemania.tiktokUser');
+      const savedUser = localStorage.getItem('fjalemania.tiktokUser') || 'game.studio.al';
       if (savedUser && el.tiktokUserInput && !el.tiktokUserInput.value) {
         el.tiktokUserInput.value = savedUser;
       }

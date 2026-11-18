@@ -778,23 +778,32 @@ function createGameEngine(opts = {}) {
     return false;
   }
 
-  function revealLetters(count) {
+  function revealLetters(count, maxPerWord = Infinity) {
     let revealed = 0;
     const candidates = shuffleArray(state.board.filter((w) => !w.solved));
     if (!state.golden.solved) candidates.push(state.golden);
 
-    for (const entry of candidates) {
-      const hidden = [];
-      for (let i = 0; i < entry.chars.length; i++) {
-        if (!entry.hinted.has(i)) hidden.push(i);
+    const revealFromPass = (cap) => {
+      for (const entry of candidates) {
+        const hidden = [];
+        for (let i = 0; i < entry.chars.length; i++) {
+          if (!entry.hinted.has(i)) hidden.push(i);
+        }
+        if (!hidden.length) continue;
+        shuffleArray(hidden);
+        let perWord = 0;
+        while (hidden.length && revealed < count && perWord < cap) {
+          entry.hinted.add(hidden.pop());
+          revealed += 1;
+          perWord += 1;
+        }
+        if (revealed >= count) break;
       }
-      if (!hidden.length) continue;
-      shuffleArray(hidden);
-      while (hidden.length && revealed < count) {
-        entry.hinted.add(hidden.pop());
-        revealed += 1;
-      }
-      if (revealed >= count) break;
+    };
+
+    revealFromPass(maxPerWord);
+    if (revealed < count && Number.isFinite(maxPerWord)) {
+      revealFromPass(Infinity);
     }
 
     if (revealed > 0) {
@@ -902,11 +911,8 @@ function createGameEngine(opts = {}) {
       nextSong(user, combo);
     } else if (gift.id === 'hint') {
       const count = 2 * Math.min(times, 2);
-      let revealed = 0;
-      for (let i = 0; i < count; i++) {
-        if (revealWord(user)) revealed += 1;
-      }
-      announce('🚀', `+${revealed || 2} FJALË · @${user}`, 'gift', 3200);
+      revealLetters(count, 1);
+      announce('🚀', `HINT NË 2 FJALË · @${user}${combo}`, 'gift', 3200);
     } else if (gift.id === 'eagle') {
       startEagle(user, combo);
     } else {

@@ -480,6 +480,15 @@
   // names forwarded by a bridge are mapped automatically (server + client).
   const GIFTS = [
     {
+      id: 'hint',
+      emoji: '🚀',
+      name: 'Rocket · Raketë',
+      effect: 'Zbulo 2 shkronja',
+      points: 100,
+      coins: 5,
+      aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe']
+    },
+    {
       id: 'theme',
       emoji: '🌹',
       name: 'Rose · Trëndafil',
@@ -496,15 +505,6 @@
       points: 50,
       coins: 1,
       aliases: ['tiktok', 'music', 'song', 'keng', 'kenge']
-    },
-    {
-      id: 'hint',
-      emoji: '🚀',
-      name: 'Rocket · Raketë',
-      effect: 'Zbulon 2 fjalë',
-      points: 100,
-      coins: 5,
-      aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe']
     },
     {
       id: 'eagle',

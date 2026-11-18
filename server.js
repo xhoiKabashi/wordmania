@@ -34,9 +34,9 @@ const { createGameEngine } = require('./engine.js');
 const GIFTS = Array.isArray(DATA.GIFTS) && DATA.GIFTS.length
   ? DATA.GIFTS
   : [
+      { id: 'hint', aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe'] },
       { id: 'theme', aliases: ['rose', 'roze', 'trendafil', 'trëndafil', 'ngjyr', 'color'] },
       { id: 'song', aliases: ['tiktok', 'music', 'song', 'keng'] },
-      { id: 'hint', aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe'] },
       { id: 'eagle', aliases: ['finger heart', 'finger', 'heart', 'zemer', 'zemër', 'gisht', 'eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj', 'vip'] }
     ];
 
@@ -45,6 +45,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const MUSIC_DIR = path.join(__dirname, 'music');
 const TIKTOK_CONFIG_PATH = path.join(__dirname, '.tiktok-config.json');
+const DEFAULT_TIKTOK_USER = 'game.studio.al';
 const MAX_BODY = 128 * 1024;
 const VERBOSE = process.env.VERBOSE === '1';
 
@@ -585,9 +586,9 @@ function loadSavedTikTokUser() {
     const raw = fs.readFileSync(TIKTOK_CONFIG_PATH, 'utf8');
     const parsed = JSON.parse(raw);
     if (parsed && parsed.autoConnect === false) return '';
-    return String(parsed?.username || '').replace(/^@+/, '').trim();
+    return String(parsed?.username || '').replace(/^@+/, '').trim() || DEFAULT_TIKTOK_USER;
   } catch {
-    return '';
+    return DEFAULT_TIKTOK_USER;
   }
 }
 
