@@ -35,15 +35,13 @@ const GIFTS = Array.isArray(DATA.GIFTS) && DATA.GIFTS.length
   ? DATA.GIFTS
   : [
       { id: 'hint', aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe'] },
-      { id: 'theme', aliases: ['rose', 'roze', 'trendafil', 'trëndafil', 'ngjyr', 'color'] },
-      { id: 'song', aliases: ['tiktok', 'music', 'song', 'keng'] },
+      { id: 'mascot', aliases: ['corgi', 'dog', 'qen', 'qeni', 'puppy', 'wolf', 'ujk', 'bear', 'ari', 'mascot', 'maskot', 'pet', 'cat', 'mace', 'donut', 'doughnut', 'rosa', 'hat', 'cap'] },
       { id: 'eagle', aliases: ['finger heart', 'finger', 'heart', 'zemer', 'zemër', 'gisht', 'eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj', 'vip'] }
     ];
 
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const MUSIC_DIR = path.join(__dirname, 'music');
 const TIKTOK_CONFIG_PATH = path.join(__dirname, '.tiktok-config.json');
 const DEFAULT_TIKTOK_USER = 'game.studio.al';
 const MAX_BODY = 128 * 1024;
@@ -60,44 +58,8 @@ const MIME_TYPES = {
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
   '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-  '.mp3': 'audio/mpeg'
+  '.woff2': 'font/woff2'
 };
-
-const AUDIO_EXTS = new Map([
-  ['.mp3', 'audio/mpeg'],
-  ['.m4a', 'audio/mp4'],
-  ['.ogg', 'audio/ogg'],
-  ['.wav', 'audio/wav']
-]);
-
-function listMusicTracks() {
-  let files = [];
-  try {
-    files = fs.readdirSync(MUSIC_DIR);
-  } catch {
-    return [];
-  }
-
-  return files
-    .filter((file) => AUDIO_EXTS.has(path.extname(file).toLowerCase()))
-    .sort((a, b) => a.localeCompare(b, 'sq'))
-    .map((file) => {
-      const ext = path.extname(file).toLowerCase();
-      let size = 0;
-      try {
-        size = fs.statSync(path.join(MUSIC_DIR, file)).size;
-      } catch {
-        /* ignore */
-      }
-      return {
-        name: path.basename(file, ext),
-        file,
-        url: `/music/${encodeURIComponent(file)}`,
-        size
-      };
-    });
-}
 
 
 /** @type {Map<number, http.ServerResponse>} */
@@ -248,13 +210,23 @@ function pickFirst(...values) {
   return '';
 }
 
-function mapGift(rawGift) {
+function mapGift(rawGift, diamondCount = 0, repeatCount = 1) {
   const name = String(rawGift || '').toLowerCase().trim();
-  if (!name) return GIFTS[0].id;
-  const direct = GIFTS.find((g) => g.id === name);
-  if (direct) return direct.id;
-  const hit = GIFTS.find((g) => (g.aliases || []).some((alias) => name.includes(alias)));
-  return hit ? hit.id : GIFTS[0].id;
+  const mult = Math.max(1, Number(repeatCount) || 1);
+  let unitCoins = Number(diamondCount) || 0;
+
+  if (!unitCoins && name) {
+    const direct = GIFTS.find((g) => g.id === name);
+    if (direct) unitCoins = Number(direct.coins) || 1;
+    else {
+      const hit = GIFTS.find((g) => (g.aliases || []).some((alias) => name.includes(alias)));
+      if (hit) unitCoins = Number(hit.coins) || 1;
+    }
+  }
+  const totalCoins = (unitCoins || 1) * mult;
+  if (totalCoins >= 10) return 'mascot';
+  if (totalCoins >= 5) return 'eagle';
+  return 'hint';
 }
 
 function normalizeType(raw) {
@@ -318,11 +290,12 @@ function sanitizeEvent(input) {
     const repeatRaw = Number(pickFirst(input.repeatCount, input.count, input.combo, 1));
     const repeat = Number.isFinite(repeatRaw) ? Math.min(100, Math.max(1, Math.round(repeatRaw))) : 1;
     const giftName = pickFirst(input.giftName, input.gift, input.giftType, input.presentName, '');
+    const diamondCount = Number(pickFirst(input.diamondCount, input.coins, 0)) || 0;
     return {
       event: {
         type: 'gift',
         user,
-        giftType: mapGift(giftName),
+        giftType: mapGift(giftName, diamondCount, repeat),
         giftName: String(giftName).slice(0, 40),
         count: repeat,
         ts: Date.now()
@@ -571,13 +544,15 @@ function mapTikTokGift(data) {
   const repeatEnd = Boolean(data?.repeatEnd);
   const rawType = giftObj?.type ?? ext?.type ?? legacy?.giftType ?? data?.giftType;
   const giftType = rawType !== undefined && rawType !== null ? Number(rawType) : (giftObj?.combo ? 1 : 0);
+  const diamondCount = Number(data?.diamondCount ?? giftObj?.diamond_count ?? ext?.diamond_count ?? legacy?.diamondCount ?? 0) || 0;
 
   return {
     user: user ? user.userId : 'Viewer',
     giftName,
     count: repeatCount,
     repeatEnd,
-    giftType
+    giftType,
+    diamondCount
   };
 }
 
@@ -733,7 +708,7 @@ async function connectTikTokLive(rawUsername, opts = {}) {
       type: 'gift',
       user: msg.user,
       giftName: msg.giftName,
-      giftType: mapGift(msg.giftName),
+      giftType: mapGift(msg.giftName, msg.diamondCount, msg.count),
       count: msg.count
     });
     console.log(`[TikTok Dhuratë] @${msg.user} dërgoi ${msg.count}x ${msg.giftName}`);
@@ -837,89 +812,6 @@ async function handleTikTokConnect(req, res) {
 /* ---------------------------------------------------------------
    MUSIC LIBRARY
    --------------------------------------------------------------- */
-
-function serveMusic(reqPath, req, res) {
-  let file = '';
-  try {
-    file = decodeURIComponent(reqPath.slice('/music/'.length));
-  } catch {
-    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('Bad Request');
-    return;
-  }
-
-  const fullPath = path.resolve(MUSIC_DIR, file);
-  if (!fullPath.startsWith(MUSIC_DIR + path.sep)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('Forbidden');
-    return;
-  }
-
-  const mime = AUDIO_EXTS.get(path.extname(fullPath).toLowerCase());
-  if (!mime) {
-    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-    res.end('Not Found');
-    return;
-  }
-
-  fs.stat(fullPath, (err, stat) => {
-    if (err || !stat.isFile()) {
-      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.end('Not Found');
-      return;
-    }
-
-    const total = stat.size;
-    const headers = {
-      'Content-Type': mime,
-      'Cache-Control': 'public, max-age=3600',
-      'Accept-Ranges': 'bytes'
-    };
-    const range = req.headers.range;
-
-    if (range) {
-      const match = /^bytes=(\d*)-(\d*)$/.exec(range);
-      let start = match && match[1] ? Number(match[1]) : 0;
-      let end = match && match[2] ? Number(match[2]) : total - 1;
-
-      if (!match || !Number.isFinite(start) || !Number.isFinite(end) || start > end || start >= total) {
-        res.writeHead(416, {
-          ...headers,
-          'Content-Range': `bytes */${total}`
-        });
-        res.end();
-        return;
-      }
-
-      end = Math.min(end, total - 1);
-      res.writeHead(206, {
-        ...headers,
-        'Content-Range': `bytes ${start}-${end}/${total}`,
-        'Content-Length': end - start + 1
-      });
-      if (req.method === 'HEAD') {
-        res.end();
-        return;
-      }
-      const stream = fs.createReadStream(fullPath, { start, end });
-      stream.on('error', () => res.destroy());
-      stream.pipe(res);
-      return;
-    }
-
-    res.writeHead(200, {
-      ...headers,
-      'Content-Length': total
-    });
-    if (req.method === 'HEAD') {
-      res.end();
-      return;
-    }
-    const stream = fs.createReadStream(fullPath);
-    stream.on('error', () => res.destroy());
-    stream.pipe(res);
-  });
-}
 
 /* ---------------------------------------------------------------
    STATIC FILES
@@ -1026,11 +918,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (pathname === '/api/music') {
-    sendJson(res, 200, { tracks: listMusicTracks() });
-    return;
-  }
-
   if (pathname === '/api/network') {
     sendJson(res, 200, networkInfo());
     return;
@@ -1080,11 +967,6 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if ((req.method === 'GET' || req.method === 'HEAD') && pathname.startsWith('/music/')) {
-    serveMusic(pathname, req, res);
-    return;
-  }
-
   if (req.method === 'GET' || req.method === 'HEAD') {
     serveStatic(pathname, res, req);
     return;
@@ -1110,7 +992,6 @@ function resolveCliTikTokUser(argv) {
 const cliUser = resolveCliTikTokUser(process.argv.slice(2)) || loadSavedTikTokUser();
 
 server.listen(PORT, HOST, () => {
-  const tracks = listMusicTracks();
   const net = networkInfo();
   const phone = net.lanEnabled && net.addresses[0] ? net.addresses[0].phoneUrl : '';
   console.log('');
@@ -1118,9 +999,6 @@ server.listen(PORT, HOST, () => {
   console.log(`  Studio : http://localhost:${PORT}/`);
   console.log(`  OBS    : http://localhost:${PORT}/?obs=1   (Browser 1080×1920)`);
   console.log(`  Webhook: http://localhost:${PORT}/api/event`);
-  console.log(
-    `  Music  : ${tracks.length ? `${tracks.length} tracks from ./music` : 'procedural fallback (./music is empty)'}`
-  );
   console.log(
     `  Phone  : ${
       phone ||

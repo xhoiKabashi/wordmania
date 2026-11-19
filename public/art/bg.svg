@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1d3a"/>
+      <stop offset="0.24" stop-color="#14325e"/>
+      <stop offset="0.44" stop-color="#224c82"/>
+      <stop offset="0.58" stop-color="#4e6e94"/>
+      <stop offset="0.68" stop-color="#d69c56"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="0.52" cy="0.5" r="0.52">
+      <stop offset="0" stop-color="#ffe39e" stop-opacity="0.92"/>
+      <stop offset="0.45" stop-color="#eab063" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#224c82" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mtnFar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#274773"/>
+      <stop offset="1" stop-color="#193154"/>
+    </linearGradient>
+    <linearGradient id="mtnNear" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a3358"/>
+      <stop offset="1" stop-color="#0f203c"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b345c"/>
+      <stop offset="0.25" stop-color="#122444"/>
+      <stop offset="0.6" stop-color="#09152b"/>
+      <stop offset="1" stop-color="#040812"/>
+    </linearGradient>
+    <linearGradient id="tower" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8CFA8"/>
+      <stop offset="1" stop-color="#9e7f5e"/>
+    </linearGradient>
+    <linearGradient id="dome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6fa3c7"/>
+      <stop offset="1" stop-color="#3a678c"/>
+    </linearGradient>
+    <linearGradient id="flag" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d91e2e"/>
+      <stop offset="0.55" stop-color="#b81422"/>
+      <stop offset="1" stop-color="#8c0c18"/>
+    </linearGradient>
+    <linearGradient id="pine" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1c3b4f"/>
+      <stop offset="1" stop-color="#0d2133"/>
+    </linearGradient>
+    <linearGradient id="commentDark" x1="0" y1="0" x2="0.65" y2="1">
+      <stop offset="0" stop-color="#040812" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#040812" stop-opacity="0.72"/>
+      <stop offset="1" stop-color="#02040a" stop-opacity="0.97"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#sky)"/>
+  <circle cx="580" cy="610" r="390" fill="url(#sunGlow)"/>
+
+  <!-- soft twilight clouds -->
+  <g fill="#9ec2e6" opacity="0.18">
+    <ellipse cx="240" cy="290" rx="190" ry="36"/>
+    <ellipse cx="370" cy="265" rx="130" ry="28"/>
+    <ellipse cx="860" cy="250" rx="200" ry="34"/>
+    <ellipse cx="730" cy="225" rx="120" ry="24"/>
+  </g>
+
+  <!-- Dajti mountains -->
+  <path d="M0 960 L190 730 L350 880 L510 710 L680 910 L810 800 L950 930 L1080 790 L1080 1200 L0 1200 Z"
+        fill="url(#mtnFar)" opacity="0.94"/>
+  <path d="M0 1070 L160 910 L320 1030 L490 880 L660 1050 L830 930 L1000 1080 L1080 1020 L1080 1260 L0 1260 Z"
+        fill="url(#mtnNear)"/>
+
+  <!-- TiranaClock Tower (Kulla e Sahatit) -->
+  <g>
+    <rect x="708" y="430" width="112" height="530" rx="6" fill="url(#tower)"/>
+    <rect x="718" y="444" width="92" height="490" rx="4" fill="#c7a982" opacity="0.38"/>
+    <path d="M698 432 L764 344 L830 432 Z" fill="#4a372b"/>
+    <rect x="698" y="545" width="132" height="16" rx="5" fill="#7c6248"/>
+    <circle cx="764" cy="495" r="28" fill="#fff6dc" stroke="#6b5139" stroke-width="6"/>
+    <line x1="764" y1="495" x2="764" y2="476" stroke="#2c2219" stroke-width="5" stroke-linecap="round"/>
+    <line x1="764" y1="495" x2="778" y2="503" stroke="#2c2219" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Et'hem Bey Mosque dome + minaret -->
+  <g>
+    <rect x="815" y="690" width="180" height="270" rx="8" fill="#d4b58e"/>
+    <path d="M825 692 Q905 575 985 692 Z" fill="url(#dome)"/>
+    <rect x="858" y="290" width="28" height="650" rx="10" fill="#dfc4a0"/>
+    <path d="M852 292 L872 212 L892 292 Z" fill="#3a526b"/>
+    <rect x="848" y="388" width="48" height="14" rx="5" fill="#8b7054"/>
+  </g>
+
+  <!-- Flagpole + Waving Albanian Flag -->
+  <g>
+    <rect x="182" y="185" width="11" height="820" rx="5" fill="#7f93ad"/>
+    <circle cx="187" cy="180" r="11" fill="#e5b95c"/>
+    <path d="M194 212 C285 232 390 250 486 286 C474 360 482 415 504 468 C400 442 296 428 194 422 Z" fill="url(#flag)"/>
+    <!-- Albanian Double-Headed Eagle on flag -->
+    <g transform="translate(302 290) scale(0.95)" fill="#100c0e">
+      <path d="M46 26c-6-10-18-14-28-10 6 4 8 8 8 14-8-4-16-2-22 4 8 0 14 4 18 12-10 0-18 6-22 16 10-4 18-2 24 4-10 6-14 16-10 26 6-8 14-10 22-8-4 10-2 18 6 24 2-10 8-16 16-18 8 2 14 8 16 18 8-6 10-14 6-24 8-2 16 0 22 8 4-10 0-20-10-26 6-6 14-8 24-4-4-10-12-16-22-16 4-8 10-12 18-12-6-6-14-8-22-4 0-6 2-10 8-14-10-4-22 0-28 10z"/>
+      <path d="M50 74l8 22 8-22z"/>
+    </g>
+  </g>
+
+  <!-- Mediterranean Pine & Olive Foliage top-left (gender-neutral, no pink flowers) -->
+  <g fill="url(#pine)">
+    <path d="M-20 0 L380 0 Q310 90 180 120 Q80 210 -20 260 Z" opacity="0.88"/>
+    <ellipse cx="64" cy="420" rx="85" ry="26" transform="rotate(-28 64 420)"/>
+    <ellipse cx="95" cy="485" rx="75" ry="22" transform="rotate(-18 95 485)"/>
+    <ellipse cx="48" cy="545" rx="82" ry="24" transform="rotate(-12 48 545)"/>
+  </g>
+
+  <!-- Foreground Skanderbeg Plaza -->
+  <path d="M0 960 L1080 960 L1080 1920 L0 1920 Z" fill="url(#ground)"/>
+  <g stroke="#395d8c" stroke-width="2.5" opacity="0.22">
+    <path d="M-40 1120 L1120 1090"/>
+    <path d="M-40 1260 L1120 1230"/>
+    <path d="M-40 1420 L1120 1385"/>
+    <path d="M-40 1600 L1120 1560"/>
+    <path d="M180 960 L70 1920"/>
+    <path d="M440 960 L370 1920"/>
+    <path d="M720 960 L690 1920"/>
+    <path d="M960 960 L980 1920"/>
+  </g>
+
+  <!-- Dark bottom & bottom-left comment zone vignette -->
+  <rect x="0" y="1300" width="1080" height="620" fill="url(#commentDark)"/>
+</svg>

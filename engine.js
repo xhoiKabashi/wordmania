@@ -35,7 +35,7 @@ function createGameEngine(opts = {}) {
     hypeGoal: 5,
     goldenMult: 3,
     bonusPoints: 25,
-    resultMs: 4000,
+    resultMs: 5500,
     idleMs: 6000,
     shuffleMs: 24000,
     simMs: 2400,
@@ -71,7 +71,10 @@ function createGameEngine(opts = {}) {
     eagleUntil: 0,
     vip: '',
     themeIdx: 0,
+    mascot: 'cat',
     hype: 0,
+    giftTotal: 0,
+    gifters: new Map(),
     comboUser: '',
     comboCount: 0,
     comboAt: 0,
@@ -89,7 +92,9 @@ function createGameEngine(opts = {}) {
     resultTicker: null,
     animateId: '',
     wrongAt: 0,
-    joinAt: 0
+    joinAt: 0,
+    chatFeed: [],
+    chatSeq: 0
   };
 
   /* ---------------------------------------------------------------
@@ -108,6 +113,23 @@ function createGameEngine(opts = {}) {
   function shortText(text, max = 14) {
     const t = String(text || '');
     return t.length > max ? `${t.slice(0, max)}…` : t;
+  }
+
+  function solvedCount() {
+    const boardSolved = state.board.filter((w) => w.solved).length;
+    const goldenSolved = state.golden && state.golden.solved ? 1 : 0;
+    return boardSolved + goldenSolved;
+  }
+
+  // Last few real chat guesses — the "social proof" strip on screen.
+  function pushChat(user, text, ok) {
+    state.chatFeed.unshift({
+      id: ++state.chatSeq,
+      user,
+      text: shortText(text, 18),
+      ok: Boolean(ok)
+    });
+    if (state.chatFeed.length > 4) state.chatFeed.length = 4;
   }
 
   function pick(arr) {
@@ -229,6 +251,12 @@ function createGameEngine(opts = {}) {
       likesProgress: state.likesProgress,
       likeGoal: state.likeGoal,
       hype: state.hype,
+      giftTotal: state.giftTotal,
+      giftGoal: CFG.hypeGoal,
+      topGifters: Array.from(state.gifters.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([user, count]) => ({ user, count })),
       timeLeft: state.timeLeft,
       mult: multiplier(),
       frenzyUntil: state.frenzyUntil,
@@ -237,6 +265,7 @@ function createGameEngine(opts = {}) {
       king: state.king,
       themeIdx: state.themeIdx,
       theme: (THEMES[state.themeIdx] || THEMES[0]).id,
+      mascot: state.mascot || 'cat',
       seasonRound: state.seasonRound,
       seasonRounds: CFG.seasonRounds,
       live: state.live,
@@ -252,6 +281,7 @@ function createGameEngine(opts = {}) {
           team: p.team
         })),
       cta: { icon: state.cta.icon, text: state.cta.text, kind: state.cta.kind },
+      chatFeed: state.chatFeed.slice(0, 4),
       overlay: {
         show: Boolean(state.overlay.show),
         emoji: state.overlay.emoji,
@@ -281,23 +311,73 @@ function createGameEngine(opts = {}) {
      --------------------------------------------------------------- */
 
   function setCta(icon, text, kind) {
-    state.cta = { icon: icon || '💬', text: String(text || ''), kind: kind || 'idle' };
+    state.cta = { icon: '', text: String(text || ''), kind: kind || 'idle' };
+  }
+
+  function buildIdleHostLine() {
+    const unsolvedBoard = state.board.filter((w) => !w.solved);
+    const total = state.board.length + (state.golden ? 1 : 0);
+    const solved = solvedCount();
+    const remaining = Math.max(0, total - solved);
+    const top = leaderboard();
+    const needLikes = Math.max(1, state.likeGoal - state.likesProgress);
+    const lines = [];
+
+    if (state.golden && !state.golden.solved) {
+      const gPts = Math.round(state.golden.chars.length * 20 * CFG.goldenMult * multiplier());
+      lines.push(
+        `Fjala e Artë ka ${state.golden.chars.length} shkronja, fillon me "${state.golden.chars[0]}" dhe jep +${fmt(gPts)} PK`
+      );
+    } else if (state.golden && state.golden.solved && remaining > 0) {
+      lines.push(
+        `Fjala e Artë u gjet nga @${state.golden.finder} — kanë mbetur edhe ${remaining} fjalë në tabelë`
+      );
+    }
+
+    if (unsolvedBoard.length) {
+      const clueWord = unsolvedBoard[state.idleIdx % unsolvedBoard.length];
+      const wPts = Math.round(clueWord.chars.length * 20 * multiplier());
+      lines.push(
+        `Ndihmë: kërko një fjalë me ${clueWord.chars.length} shkronja që fillon me "${clueWord.chars[0]}" për +${fmt(wPts)} PK`
+      );
+    }
+
+    if (top.length >= 2) {
+      lines.push(
+        `@${top[0].user} kryeson me ${fmt(top[0].score)} PK, ndjekur nga @${top[1].user} me ${fmt(top[1].score)} PK`
+      );
+    } else if (top.length === 1) {
+      lines.push(
+        `@${top[0].user} mban vendin e parë me ${fmt(top[0].score)} PK — kush e kalon në koment?`
+      );
+    } else {
+      lines.push(
+        `Formo fjalë shqipe nga shkronjat poshtë dhe shkruaji në koment për të marrë kryesimin`
+      );
+    }
+
+    if (solved > 0 && remaining > 0) {
+      lines.push(
+        `Janë zbuluar ${solved} nga ${total} fjalë — kush e gjen fjalën e radhës në tabelë?`
+      );
+    }
+
+    lines.push(
+      `Na duhen edhe ${fmt(needLikes)} pëlqime për të hapur një shkronjë ndihmëse në tabelë`
+    );
+
+    return lines[state.idleIdx % lines.length];
   }
 
   function showIdleCta(shouldFlush = true) {
-    if (state.idleIdx % 2 === 0 || TIPS.length < 2) {
-      setCta('💬', 'SHKRUAJ FJALËN NË KOMENT', 'idle');
-    } else {
-      const tip = TIPS[1 + (Math.floor(state.idleIdx / 2) % (TIPS.length - 1))];
-      setCta(tip[0], tip[1], 'idle');
-    }
+    setCta('', buildIdleHostLine(), 'idle');
     if (shouldFlush) flushState();
   }
 
-  function announce(icon, text, kind = 'idle', ms = 3000) {
+  function announce(icon, text, kind = 'idle', ms = 3200) {
     if (state.ctaTimer) clearTimeout(state.ctaTimer);
     state.ctaHoldUntil = Date.now() + ms;
-    setCta(icon, text, kind);
+    setCta('', text, kind);
     state.ctaTimer = setTimeout(() => {
       state.ctaTimer = null;
       state.ctaHoldUntil = 0;
@@ -309,7 +389,7 @@ function createGameEngine(opts = {}) {
 
   function maybeAnnounce(icon, text, kind) {
     if (Date.now() < state.ctaHoldUntil) return false;
-    announce(icon, text, kind, 1900);
+    announce('', text, kind, 2200);
     return true;
   }
 
@@ -413,6 +493,7 @@ function createGameEngine(opts = {}) {
     state.timeLeft = CFG.roundSeconds;
     state.roundEndsAt = Date.now() + CFG.roundSeconds * 1000;
     state.foundBonus = new Set();
+    state.chatFeed = [];
     state.comboUser = '';
     state.comboCount = 0;
     state.letters = shuffleArray([...round.letters]);
@@ -464,7 +545,7 @@ function createGameEngine(opts = {}) {
     }
 
     pushFx({ kind: 'shuffle' });
-    announce('🎬', round.category, 'warn', 3200);
+    showIdleCta(false);
     if (shouldFlush) flushState();
   }
 
@@ -546,6 +627,8 @@ function createGameEngine(opts = {}) {
     state.likesProgress = 0;
     state.likeGoal = CFG.likeGoalStart;
     state.hype = 0;
+    state.giftTotal = 0;
+    state.gifters.clear();
     state.comboUser = '';
     state.comboCount = 0;
     state.comboAt = 0;
@@ -640,7 +723,7 @@ function createGameEngine(opts = {}) {
       state.king = top.user;
       if (hadKing) {
         pushFx({ kind: 'new_king' });
-        announce('👑', `MBRET I RI: @${top.user} · ${fmt(top.score)} PK`, 'gold', 3400);
+        announce('', `Lider i ri në krye: @${top.user} kaloi i pari me ${fmt(top.score)} PK`, 'gold', 3400);
       }
     }
   }
@@ -674,16 +757,30 @@ function createGameEngine(opts = {}) {
     refreshKing();
 
     if (entry.golden) {
-      announce('👑', `FJALA E ARTË +${fmt(points)} PK · @${player.user}`, 'gold', 4200);
+      announce('', `Mrekulli nga @${player.user}! Zbuloi Fjalën e Artë "${entry.raw}" për +${fmt(points)} PK`, 'gold', 4200);
+    } else if (comboLevel > 1) {
+      announce('', `Seri x${comboLevel} nga @${player.user}! Gjeti fjalën "${entry.raw}" për +${fmt(points)} PK`, 'find', 3200);
     } else {
-      const comboTag = comboLevel > 1 ? ` 🔥x${comboLevel}` : '';
-      announce('🎉', `"${entry.raw}" +${fmt(points)} PK${comboTag} · @${player.user}`, 'find', 3200);
+      announce('', `Bravo @${player.user}! Gjeti fjalën "${entry.raw}" dhe fitoi +${fmt(points)} PK`, 'find', 3200);
     }
 
     if (comboLevel >= 2) pushFx({ kind: 'combo', level: comboLevel });
   }
 
-  function handleComment(rawUser, rawText, forcedTeam) {
+  function handleComment(rawUser, rawText, forcedTeam, simulated) {
+    if (state.phase !== 'playing') return false;
+    const text = String(rawText || '').trim();
+    if (!text) return false;
+    if (!simulated) {
+      const before = solvedCount();
+      const handled = handleCommentCore(rawUser, text, forcedTeam);
+      if (!teamJoin(text)) pushChat(cleanUser(rawUser), text, solvedCount() > before);
+      return handled;
+    }
+    return handleCommentCore(rawUser, text, forcedTeam);
+  }
+
+  function handleCommentCore(rawUser, rawText, forcedTeam) {
     if (state.phase !== 'playing') return false;
     const text = String(rawText || '').trim();
     if (!text) return false;
@@ -727,7 +824,8 @@ function createGameEngine(opts = {}) {
       }
     }
     if (already) {
-      return maybeAnnounce('⏱️', `"${already.raw}" u gjet më parë · @${user}`, 'warn');
+      const who = already.finder ? ` nga @${already.finder}` : '';
+      return maybeAnnounce('', `@${user}, fjala "${already.raw}" është gjetur më parë${who}`, 'warn');
     }
 
     let bonusHit = norm.length <= 28 && state.bonusPool.has(norm) && !state.foundBonus.has(norm) ? norm : null;
@@ -766,14 +864,14 @@ function createGameEngine(opts = {}) {
       player.score += points;
       player.words += 1;
       pushFx({ kind: 'bonus_word', chars: rawChars });
-      announce('🌟', `BONUS "${raw}" +${fmt(points)} PK · @${user}`, 'find', 3000);
+      announce('', `Fjalë bonus nga @${user}! "${raw}" shton +${fmt(points)} PK në renditje`, 'find', 3000);
       refreshKing();
       return true;
     }
 
     if (Date.now() - state.wrongAt > 2500) {
       state.wrongAt = Date.now();
-      return maybeAnnounce('💬', `"${shortText(text)}" — jo në tabelë · @${user}`, 'warn');
+      return maybeAnnounce('', `@${user}, fjala "${shortText(text)}" nuk është në tabelën e këtij raundi`, 'warn');
     }
     return false;
   }
@@ -854,31 +952,19 @@ function createGameEngine(opts = {}) {
     if (revealed > 0) {
       const text =
         revealed === 1
-          ? `${fmt(state.likeGoal - step)} LIKES! U ZBULUA 1 SHKRONJË`
-          : `${fmt(count)} LIKES! U ZBULUAN ${revealed} SHKRONJA`;
-      announce('❤️', text, 'like', 3400);
+          ? `Faleminderit për pëlqimet! Sapo u zbulua 1 shkronjë ndihmëse në tabelë`
+          : `Faleminderit për pëlqimet! Sapo u zbuluan ${revealed} shkronja ndihmëse në tabelë`;
+      announce('', text, 'like', 3400);
     }
     return true;
   }
 
-  function nextTheme(user, combo = '') {
-    state.themeIdx = (state.themeIdx + 1) % THEMES.length;
-    const theme = THEMES[state.themeIdx];
-    pushFx({ kind: 'theme' });
-    announce('🌹', `NGJYRAT: ${theme.name} · @${user}${combo}`, 'gift', 3400);
-  }
-
-  function nextSong(user, combo = '') {
-    pushFx({ kind: 'song', user, combo });
-    announce('🎵', `KËNGË E RE · @${user}${combo}`, 'gift', 3400);
-  }
-
   function startEagle(user, combo = '') {
-    state.eagleUntil = Date.now() + 45000;
     state.vip = user;
     pushFx({ kind: 'eagle' });
-    revealWord(user);
-    announce('🫰', `3X VIP 45 SEKONDA · @${user}${combo}`, 'gold', 4200);
+    const solvedWord = revealWord(user);
+    const wordText = solvedWord ? `zbuloi fjalën "${solvedWord}"` : 'hapi 1 fjalë të plotë';
+    announce('', `Faleminderit @${user}${combo}! Me 5 monedha ${wordText} në tabelë`, 'find', 3600);
   }
 
   function hyperUnlock(player) {
@@ -889,7 +975,7 @@ function createGameEngine(opts = {}) {
       revealLetters(4);
     }
     startFrenzy(30);
-    announce('🎁', `HYPER! FJALA E ARTË + 3X · @${player.user}`, 'gold', 4600);
+    announce('', `Hyper aktiv nga @${player.user}! Fjala e Artë u hap dhe pikët janë 3X`, 'gold', 4600);
   }
 
   function handleGift(rawUser, typeId, repeat = 1) {
@@ -898,28 +984,40 @@ function createGameEngine(opts = {}) {
     const player = getOrCreatePlayer(user);
     const gift = GIFTS.find((g) => g.id === typeId) || GIFTS[0];
     const times = Math.max(1, Math.min(10, Math.floor(Number(repeat) || 1)));
-    const combo = times > 1 ? ` ${times}×` : '';
+    const combo = times > 1 ? ` ${times}x` : '';
 
     player.score += gift.points * times;
     refreshKing();
 
     pushFx({ kind: 'gift', giftId: gift.id, emoji: gift.emoji });
 
-    if (gift.id === 'theme') {
-      nextTheme(user, combo);
-    } else if (gift.id === 'song') {
-      nextSong(user, combo);
-    } else if (gift.id === 'hint') {
-      const count = 2 * Math.min(times, 2);
-      revealLetters(count, 1);
-      announce('🚀', `HINT NË 2 FJALË · @${user}${combo}`, 'gift', 3200);
+    if (gift.id === 'hint') {
+      const count = Math.min(times, 4);
+      const got = revealLetters(count, 1) || 1;
+      announce(
+        '',
+        `Faleminderit @${user}${combo}! Dhurata hapi ${got === 1 ? '1 shkronjë' : `${got} shkronja`} në tabelë`,
+        'gift',
+        3200
+      );
     } else if (gift.id === 'eagle') {
       startEagle(user, combo);
+    } else if (gift.id === 'mascot') {
+      state.mascot = state.mascot === 'dog' ? 'cat' : 'dog';
+      revealLetters(1, 1);
+      pushFx({ kind: 'mascot', mascot: state.mascot });
+      const label =
+        state.mascot === 'dog'
+          ? `Faleminderit @${user}${combo}! Me 10+ monedha solli Qenin Shqiptar në lojë`
+          : `Faleminderit @${user}${combo}! Me 10+ monedha riktheu Macen Shqiptare në lojë`;
+      announce('', label, 'gold', 3800);
     } else {
-      announce(gift.emoji, `@${user} dërgoi${combo} ${gift.name}!`, 'gift', 2600);
+      announce('', `Faleminderit @${user} për dhuratën`, 'gift', 2600);
     }
 
     state.hype += times;
+    state.giftTotal += times;
+    state.gifters.set(user, (state.gifters.get(user) || 0) + times);
     while (state.hype >= CFG.hypeGoal) {
       state.hype -= CFG.hypeGoal;
       hyperUnlock(player);
@@ -942,7 +1040,7 @@ function createGameEngine(opts = {}) {
       const unsolved = [...state.board, state.golden].filter((w) => !w.solved);
       if (unsolved.length) {
         const word = pick(unsolved);
-        if (handleComment(viewer.user, word.raw, viewer.team)) changed = true;
+        if (handleComment(viewer.user, word.raw, viewer.team, true)) changed = true;
       }
     } else if (roll < (viral ? 0.82 : 0.62)) {
       if (addLikes(viral ? randInt(90, 260) : randInt(18, 55))) changed = true;
@@ -1054,13 +1152,13 @@ function createGameEngine(opts = {}) {
     let changed = !event.isSimulated;
     switch (event.type) {
       case 'comment':
-        if (handleComment(event.user, event.text, event.team)) changed = true;
+        if (handleComment(event.user, event.text, event.team, Boolean(event.isSimulated))) changed = true;
         break;
       case 'like':
         if (addLikes(event.count || 1)) changed = true;
         break;
       case 'gift':
-        if (handleGift(event.user, event.giftType || event.giftName || 'theme', event.count || 1)) changed = true;
+        if (handleGift(event.user, event.giftType || event.giftName || 'hint', event.count || 1)) changed = true;
         break;
       case 'join':
       case 'follow':

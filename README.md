@@ -294,6 +294,8 @@ URL flags:
 | Round length, board size, seasons, tiers | `CFG` at the top of `public/game.js` |
 | Colors, sizes, safe zones | `public/styles.css` (`:root` + theme blocks) |
 | Music playlist | drop `.mp3` / `.m4a` / `.ogg` / `.wav` files into `music/` |
+| Stage artwork | `public/art/bg.svg` (Tirana backdrop) |
+| Mascot | `public/art/mascot.svg` (the duck host) |
 
 After editing any topic, run:
 

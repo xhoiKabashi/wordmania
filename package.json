@@ -7,7 +7,7 @@
     "start": "node --preserve-symlinks server.js",
     "start:win": "node --preserve-symlinks server.js",
     "firewall": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/open-firewall.ps1",
-    "check": "node --preserve-symlinks scripts/verify-words.js && node --preserve-symlinks --check engine.js && node --preserve-symlinks --check server.js && node --preserve-symlinks --check public/game.js && node --preserve-symlinks --check public/audio.js && node --preserve-symlinks --check public/words-al.js",
+    "check": "node --preserve-symlinks scripts/verify-words.js && node --preserve-symlinks --check engine.js && node --preserve-symlinks --check server.js && node --preserve-symlinks --check public/game.js && node --preserve-symlinks --check public/mascot-pixi.js && node --preserve-symlinks --check public/audio.js && node --preserve-symlinks --check public/words-al.js",
     "check:words": "node --preserve-symlinks scripts/verify-words.js",
     "bridge": "node --preserve-symlinks scripts/tiktok-bridge.js"
   },

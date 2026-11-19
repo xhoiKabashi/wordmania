@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 280" fill="none">
+  <defs>
+    <linearGradient id="furSlate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4e6582"/>
+      <stop offset="0.6" stop-color="#384d69"/>
+      <stop offset="1" stop-color="#25364d"/>
+    </linearGradient>
+    <linearGradient id="furCream" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbf7ef"/>
+      <stop offset="0.7" stop-color="#efe6d6"/>
+      <stop offset="1" stop-color="#dfd0ba"/>
+    </linearGradient>
+    <linearGradient id="plisGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffdf8"/>
+      <stop offset="0.75" stop-color="#f2e9d8"/>
+      <stop offset="1" stop-color="#dfd2bc"/>
+    </linearGradient>
+    <linearGradient id="xhamadan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c91f2f"/>
+      <stop offset="1" stop-color="#860e1a"/>
+    </linearGradient>
+    <linearGradient id="goldTrim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe58f"/>
+      <stop offset="0.5" stop-color="#f2b838"/>
+      <stop offset="1" stop-color="#b87c14"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shoulders & Albanian Xhamadan Vest -->
+  <path d="M58 258 C62 198 106 174 170 174 C234 174 278 198 282 258 Z" fill="url(#furCream)" stroke="#1b283b" stroke-width="5"/>
+  <path d="M84 256 C88 202 118 182 170 182 C222 182 252 202 256 256 Z" fill="url(#xhamadan)" stroke="#1b283b" stroke-width="5"/>
+  <!-- Inner white shirt V-neck -->
+  <path d="M138 184 L170 246 L202 184 Z" fill="url(#furCream)" stroke="#1b283b" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Gold Gajtana Embroidery on Xhamadan -->
+  <path d="M128 188 L158 252 M212 188 L182 252" stroke="url(#goldTrim)" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M98 228 Q120 220 136 238 M242 228 Q220 220 204 238" stroke="url(#goldTrim)" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Left & Right Ears -->
+  <path d="M64 134 L46 58 L116 88 Z" fill="url(#furSlate)" stroke="#1b283b" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M68 122 L58 74 L104 94 Z" fill="#cbb9a1"/>
+  <path d="M276 134 L294 58 L224 88 Z" fill="url(#furSlate)" stroke="#1b283b" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M272 122 L282 74 L236 94 Z" fill="#cbb9a1"/>
+
+  <!-- Head Base (Slate Blue & Cream Blaze) -->
+  <path d="M56 142 C56 88 104 54 170 54 C236 54 284 88 284 142 C284 188 240 212 170 212 C100 212 56 188 56 142 Z"
+        fill="url(#furSlate)" stroke="#1b283b" stroke-width="5.5"/>
+  <!-- White Facial Blaze -->
+  <path d="M68 156 C86 144 134 128 170 96 C206 128 254 144 272 156 C268 192 228 212 170 212 C112 212 72 192 68 156 Z"
+        fill="url(#furCream)"/>
+  <path d="M56 142 C56 88 104 54 170 54 C236 54 284 88 284 142 C284 188 240 212 170 212 C100 212 56 188 56 142 Z"
+        fill="none" stroke="#1b283b" stroke-width="5.5"/>
+
+  <!-- Whiskers -->
+  <g stroke="#1b283b" stroke-width="3.2" stroke-linecap="round" opacity="0.75">
+    <line x1="68" y1="158" x2="28" y2="152"/>
+    <line x1="70" y1="170" x2="32" y2="174"/>
+    <line x1="272" y1="158" x2="312" y2="152"/>
+    <line x1="270" y1="170" x2="308" y2="174"/>
+  </g>
+
+  <!-- Confident Eyes & Eyebrows -->
+  <path d="M104 124 Q124 114 142 124" stroke="#182334" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M198 124 Q216 114 236 124" stroke="#182334" stroke-width="5.5" stroke-linecap="round"/>
+  <ellipse cx="124" cy="142" rx="14" ry="15" fill="#132033"/>
+  <circle cx="120" cy="137" r="4.8" fill="#ffffff"/>
+  <circle cx="129" cy="147" r="2.2" fill="#7dd3fc"/>
+  <ellipse cx="216" cy="142" rx="14" ry="15" fill="#132033"/>
+  <circle cx="212" cy="137" r="4.8" fill="#ffffff"/>
+  <circle cx="221" cy="147" r="2.2" fill="#7dd3fc"/>
+
+  <!-- Nose & Confident Grin -->
+  <path d="M163 156 L177 156 L170 165 Z" fill="#27364b" stroke="#182334" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M150 169 Q160 177 170 167 Q180 177 190 169" stroke="#182334" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M156 172 Q170 194 184 172 Z" fill="#b92b3a" stroke="#182334" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- Traditional Albanian Plis (Qeleshe) Cap -->
+  <path d="M88 94 C88 32 124 14 170 14 C216 14 252 32 252 94 Z"
+        fill="url(#plisGrad)" stroke="#1b283b" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M84 92 Q170 80 256 92" stroke="#8c1823" stroke-width="5" stroke-linecap="round"/>
+  <!-- Albanian Double-Headed Eagle on Plis -->
+  <g transform="translate(170 54) scale(0.55)" fill="#141821">
+    <path d="M0-28c-5-8-14-11-22-7 5 3 7 7 7 11-7-3-13-1-18 3 7 0 11 3 14 9-8 0-14 4-18 12 8-3 14-1 19 3-8 4-11 12-8 20 5-7 11-8 17-7-3 8-1 14 5 19 1-8 7-12 12-13 5 1 11 5 12 13 6-5 8-11 5-19 6-1 12 0 17 7 3-8 0-16-8-20 5-4 11-6 19-3-4-8-10-12-18-12 3-6 7-9 14-9-5-4-11-6-18-3 0-4 2-8 7-11-8-4-17-1-22 7z"/>
+    <path d="M-5 16 L0 32 L5 16 Z"/>
+  </g>
+
+  <!-- 3 Golden Comic Action Rays (right of Plis, matching reference image) -->
+  <g fill="url(#goldTrim)" stroke="#1b283b" stroke-width="3.5" stroke-linejoin="round">
+    <polygon points="282,42 308,20 318,32 288,50"/>
+    <polygon points="294,64 330,54 333,68 296,74"/>
+    <polygon points="292,86 326,86 324,100 290,95"/>
+  </g>
+
+  <!-- Paws Resting on the Top Border of the Board -->
+  <g>
+    <ellipse cx="96" cy="252" rx="32" ry="20" fill="url(#furCream)" stroke="#1b283b" stroke-width="5"/>
+    <line x1="86" y1="248" x2="86" y2="266" stroke="#1b283b" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="104" y1="248" x2="104" y2="266" stroke="#1b283b" stroke-width="3.5" stroke-linecap="round"/>
+
+    <ellipse cx="244" cy="252" rx="32" ry="20" fill="url(#furCream)" stroke="#1b283b" stroke-width="5"/>
+    <line x1="236" y1="248" x2="236" y2="266" stroke="#1b283b" stroke-width="3.5" stroke-linecap="round"/>
+    <line x1="254" y1="248" x2="254" y2="266" stroke="#1b283b" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+</svg>

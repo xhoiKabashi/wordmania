@@ -52,6 +52,7 @@
     boardSig: '',
     top3Sig: '',
     overlaySig: '',
+    chatSig: '',
     topUsers: ['', '', ''],
     lastSnap: null
   };
@@ -77,12 +78,26 @@
     ctaBar: $('ctaBar'),
     ctaIcon: $('ctaIcon'),
     ctaText: $('ctaText'),
+    mascot: $('mascot'),
+    mascotImg: $('mascotImg'),
+    mascotBubble: $('mascotBubble'),
+    chatFeed: $('chatFeed'),
+    jarFill: $('jarFill'),
+    jarTotal: $('jarTotal'),
+    jarCount: $('jarCount'),
+    jarGoal: $('jarGoal'),
     goldenCard: $('goldenCard'),
     goldenTiles: $('goldenTiles'),
     goldenSub: $('goldenSub'),
     wordsGrid: $('wordsGrid'),
     progress: $('progressText'),
     letterBank: $('letterBank'),
+    wheelShuffleBtn: $('wheelShuffleBtn'),
+    orbHintBtn: $('orbHintBtn'),
+    orbLikesCount: $('orbLikesCount'),
+    orbMultBtn: $('orbMultBtn'),
+    orbMultLabel: $('orbMultLabel'),
+    likesPillBox: $('likesPillBox'),
     giftLegend: $('giftLegend'),
     top3: $('top3Strip'),
     overlay: $('roundOverlay'),
@@ -336,10 +351,9 @@
      --------------------------------------------------------------- */
 
   const GIFT_SVGS = {
-    theme: `<img class="gift-img" src="/gifts/rose.png" alt="Rose" />`,
-    song: `<img class="gift-img" src="/gifts/tiktok.png" alt="TikTok" />`,
-    hint: `<img class="gift-img" src="/gifts/rocket.png" alt="Rocket" />`,
-    eagle: `<img class="gift-img" src="/gifts/finger-heart.png" alt="Finger Heart" />`
+    hint: `<img class="gift-img" src="/gifts/finger-heart.png" alt="Zemër me gishta" />`,
+    mascot: `<img class="gift-img" src="/gifts/dog-gift.png" alt="Qeni VIP" />`,
+    eagle: `<img class="gift-img" src="/gifts/rocket.png" alt="Raketë VIP" />`
   };
 
   const UI_SVGS = {
@@ -351,9 +365,8 @@
     '🔥': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-flame"/></svg>`,
     '🏆': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-trophy"/></svg>`,
     '🎉': `<svg class="ui-ico" aria-hidden="true"><use href="#ico-spark"/></svg>`,
-    '🌹': GIFT_SVGS.theme,
-    '🎵': GIFT_SVGS.song,
     '🚀': GIFT_SVGS.hint,
+    '🐶': GIFT_SVGS.mascot,
     '🫰': GIFT_SVGS.eagle
   };
 
@@ -373,8 +386,10 @@
       const until = m === 3 ? state.eagleUntil : state.frenzyUntil;
       const secs = Math.max(1, Math.ceil((until - Date.now()) / 1000));
       el.multPill.textContent = `${m}X · ${secs}s`;
+      if (el.orbMultLabel) el.orbMultLabel.textContent = `${m}X · ${secs}s`;
     } else {
       el.multPill.textContent = '1X';
+      if (el.orbMultLabel) el.orbMultLabel.textContent = '3X VIP';
     }
     el.multPill.classList.toggle('on', m > 1);
     el.stage.classList.toggle('eagle', m === 3);
@@ -387,12 +402,15 @@
     const progress = Math.max(0, Math.min(goal, state.likesProgress));
     const level = Math.max(1, Math.round((goal - CFG.likeGoalStart) / CFG.likeGoalStep) + 1);
     el.likesFill.style.width = `${(progress / goal) * 100}%`;
-    el.likesLevel.textContent = `NIVELI ${level}`;
+    el.likesLevel.textContent = `NIV ${level}`;
     el.likesGoal.textContent = `${fmt(progress)} / ${fmt(goal)} → ZBULON 1 SHKRONJË`;
+    if (el.orbLikesCount) {
+      el.orbLikesCount.textContent = `${fmt(Math.max(0, goal - progress))}`;
+    }
   }
 
   function renderProgress() {
-    if (!state.golden) return;
+    if (!state.golden || !el.progress) return;
     const solved = state.board.filter((w) => w.solved).length + (state.golden.solved ? 1 : 0);
     el.progress.textContent = `${solved} / ${state.board.length + 1} gjetur`;
   }
@@ -407,7 +425,7 @@
       tile.classList.add('hinted');
       tile.textContent = entry.chars[index];
     } else {
-      tile.textContent = '•';
+      tile.textContent = '';
     }
     return tile;
   }
@@ -466,15 +484,23 @@
     el.goldenTiles.style.fontSize = `${tileFont(w.chars.length, true)}px`;
     w.chars.forEach((_, i) => el.goldenTiles.appendChild(buildTile(w, i)));
 
+    let captionClass = 'golden-sub word-caption';
     if (w.solved) {
+      captionClass += ' solved-by';
       if (w.points > 0) {
-        el.goldenSub.textContent = `@${w.finder} +${fmt(w.points)} PK`;
+        el.goldenSub.textContent = `@${w.finder} +${fmt(w.points)}`;
+      } else if (w.finder === 'HYPER') {
+        el.goldenSub.textContent = '🎁 HYPER';
+      } else if (w.finder && w.finder !== 'Hint') {
+        el.goldenSub.textContent = `🎁 @${w.finder}`;
       } else {
-        el.goldenSub.textContent = w.finder === 'HYPER' ? '🎁 HYPER UNLOCK' : '💡 U ZBULUA';
+        el.goldenSub.textContent = '💡 Hint';
       }
     } else {
-      el.goldenSub.textContent = `${w.chars.length} shkronja · +${fmt(w.chars.length * 20 * CFG.goldenMult)} PK`;
+      if (w.hinted.size > 0) captionClass += ' hint-tag';
+      el.goldenSub.textContent = `${w.chars.length} shkronja · ${fmt(w.chars.length * 20 * CFG.goldenMult)} PK`;
     }
+    el.goldenSub.className = captionClass;
   }
 
   function renderLetters() {
@@ -490,6 +516,30 @@
     setTimeout(() => {
       el.letterBank.querySelectorAll('.letter.pulse').forEach((n) => n.classList.remove('pulse'));
     }, 700);
+  }
+
+  function shuffleWheelAngles() {
+    const total = state.letterNodes.length;
+    if (!total) return;
+    const indices = state.letterNodes.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = indices[i];
+      indices[i] = indices[j];
+      indices[j] = tmp;
+    }
+    state.letterNodes.forEach((item, idx) => {
+      const angle = Math.round((360 / total) * indices[idx]);
+      item.el.style.setProperty('--angle', `${angle}deg`);
+      item.el.classList.add('pulse');
+    });
+    if (el.wheelShuffleBtn) {
+      el.wheelShuffleBtn.classList.add('spin');
+      setTimeout(() => el.wheelShuffleBtn.classList.remove('spin'), 380);
+    }
+    setTimeout(() => {
+      el.letterBank.querySelectorAll('.letter.pulse').forEach((n) => n.classList.remove('pulse'));
+    }, 520);
   }
 
   function renderTop3() {
@@ -542,23 +592,47 @@
     }
   }
 
+  const COIN_SVG = `<svg class="coin-svg" viewBox="0 0 36 36" aria-hidden="true">
+    <defs>
+      <radialGradient id="coinGrad" cx="35%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="#fff7cc"/>
+        <stop offset="45%" stop-color="#facc15"/>
+        <stop offset="85%" stop-color="#d97706"/>
+        <stop offset="100%" stop-color="#92400e"/>
+      </radialGradient>
+    </defs>
+    <circle cx="18" cy="18" r="16" fill="url(#coinGrad)" stroke="#fef08a" stroke-width="2"/>
+    <circle cx="18" cy="18" r="12" fill="none" stroke="rgba(120,53,15,0.45)" stroke-width="1.5" stroke-dasharray="3 2"/>
+    <path d="M18 9l2.4 5.2 5.6.6-4.2 3.8 1.2 5.4-5-2.8-5 2.8 1.2-5.4-4.2-3.8 5.6-.6z" fill="#fffbeb" opacity="0.9"/>
+  </svg>`;
+
   function buildStaticUi() {
     el.giftLegend.textContent = '';
     GIFTS.forEach((g) => {
-      const chip = makeEl('div', 'gift-chip');
+      const chip = makeEl('div', `gift-chip tier-${g.id}`);
+      const badge = makeEl('div', 'gift-coin-badge');
+      const coinIcon = makeEl('span', 'coin-ico');
+      coinIcon.innerHTML = COIN_SVG;
+      const numWrap = makeEl('span', 'coin-label');
+      numWrap.append(
+        makeEl('b', 'coin-num', g.badgeNum || String(g.coins || 1)),
+        makeEl('small', 'coin-unit', g.badgeUnit || (g.coins === 1 ? 'COIN' : 'COINS'))
+      );
+      badge.append(coinIcon, numWrap);
+
       const text = makeEl('span', 'gift-text');
       text.append(makeEl('b', '', g.name), makeEl('small', '', g.effect));
-      const ico = makeEl('span', 'gift-emoji');
-      if (GIFT_SVGS[g.id]) ico.innerHTML = GIFT_SVGS[g.id];
-      else ico.textContent = g.emoji;
-      chip.append(ico, text);
+
+      const pts = makeEl('span', 'gift-pts', `+${fmt(g.points)} PK`);
+
+      chip.append(badge, text, pts);
       el.giftLegend.appendChild(chip);
     });
 
     if (el.giftButtons) {
       el.giftButtons.textContent = '';
       GIFTS.forEach((g) => {
-        const btn = makeEl('button', 'btn', `${g.emoji} ${g.name}`);
+        const btn = makeEl('button', 'btn', `${g.badgeNum || g.coins} ${g.badgeUnit || 'COINS'} · ${g.name}`);
         btn.type = 'button';
         btn.title = `${g.effect} · +${g.points} PK`;
         btn.addEventListener('click', () => {
@@ -655,31 +729,27 @@
         }
         case 'reveal_letters':
           burstAt(el.letterBank, 10);
+          mascotReact('hint');
           break;
         case 'gift':
-          SFX.playGiftEffect(item.giftId || 'theme');
+          SFX.playGiftEffect(item.giftId || 'hint');
           burstAt(el.giftLegend, 10, item.emoji || '🎁');
+          mascotReact('gift');
           break;
-        case 'theme':
-          flash('flash-pink');
+        case 'mascot':
+          flash('flash-gold');
           bigConfetti();
-          burstAt(el.giftLegend, 14, '🌹');
+          burstAt(el.mascot, 18, item.mascot === 'dog' ? '🐶' : '🐱');
+          if (mascotPixi && item.mascot) mascotPixi.setCharacter(item.mascot);
+          mascotReact('found');
           break;
-        case 'song': {
-          SFX.nextSong();
-          if (!SFX.musicEnabled) {
-            SFX.startMusic();
-            if (el.musicBtn) el.musicBtn.textContent = '⏸️ Muzikë';
-          }
-          updateNowPlaying();
-          break;
-        }
         case 'eagle':
           flash('flash-gold');
           shake();
           burstAt(el.goldenCard, 18, '🫰');
           bigConfetti();
           SFX.playNewKing();
+          mascotReact('gold');
           break;
         case 'hyper':
           flash('flash-pink');
@@ -687,6 +757,7 @@
           bigConfetti();
           burstAt(el.goldenCard, 16, '🎁');
           SFX.playHype();
+          mascotReact('gold');
           break;
         case 'frenzy':
           burstAt(el.ctaBar, 18, '🔥');
@@ -714,8 +785,113 @@
   }
 
   /* ---------------------------------------------------------------
-     APPLY AUTHORITATIVE SNAPSHOT FROM SERVER
+     HOST STRIP: live chat feed, mascot, gift jar
      --------------------------------------------------------------- */
+
+  let mascotPixi = null;
+
+  function renderChatFeed(rows) {
+    if (!el.chatFeed) return;
+    const list = Array.isArray(rows) ? rows : [];
+    const sig = JSON.stringify(list);
+    if (sig === state.chatSig) return;
+    state.chatSig = sig;
+    el.chatFeed.textContent = '';
+
+    if (mascotPixi && list.length) {
+      mascotPixi.speak(950);
+    }
+
+    if (!list.length) {
+      el.chatFeed.appendChild(makeEl('div', 'chat-row placeholder', 'Komento fjalën tënde…'));
+      return;
+    }
+
+    for (const r of list.slice(0, 4)) {
+      const row = makeEl('div', `chat-row${r.ok ? ' ok' : ''}`);
+      row.append(
+        makeEl('span', 'chat-user', `@${r.user}`),
+        makeEl('span', 'chat-text', String(r.text || '').toUpperCase()),
+        makeEl('span', 'chat-mark', r.ok ? '✓' : '')
+      );
+      el.chatFeed.appendChild(row);
+    }
+  }
+
+  function renderGiftJar(snapshot) {
+    const goal = Math.max(1, Number(snapshot.giftGoal) || 5);
+    const prog = Math.max(0, Math.min(goal, Number(snapshot.hype) || 0));
+    if (el.jarFill) el.jarFill.style.height = `${(prog / goal) * 100}%`;
+    if (el.jarTotal) el.jarTotal.textContent = fmt(Number(snapshot.giftTotal) || 0);
+    if (el.jarCount) el.jarCount.textContent = prog;
+    if (el.jarGoal) el.jarGoal.textContent = goal;
+  }
+
+  // Prefer hand-drawn PNG art when the user drops it into /public/art/.
+  // Falls back silently to the bundled SVGs.
+  function preferArt() {
+    const bg = new Image();
+    bg.onload = () => el.stage.classList.add('art-bg');
+    bg.src = '/art/bg.png';
+
+    if (window.initMascotPixi && el.mascot) {
+      mascotPixi = window.initMascotPixi(el.mascot);
+    }
+  }
+
+  function mascotReact(mode) {
+    if (!el.mascot) return;
+    el.mascot.classList.remove('bounce');
+    void el.mascot.offsetWidth;
+    el.mascot.classList.add('bounce');
+    if (mascotPixi) {
+      mascotPixi.react(mode);
+    }
+  }
+
+  function renderHostSpeech(rawText, kind) {
+    if (!el.ctaText) return;
+    const clean = String(rawText || '')
+      .replace(/[^\p{L}\p{N}\s&().,'!?+*#@_:"/—-]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!clean) return;
+
+    if (clean === state.lastSpeechText && kind === state.lastSpeechKind) return;
+    const changed = clean !== state.lastSpeechText;
+    state.lastSpeechText = clean;
+    state.lastSpeechKind = kind;
+
+    if (el.ctaBar) {
+      el.ctaBar.className = `speech-bubble ${kind || 'idle'}`;
+    }
+
+    el.ctaText.textContent = '';
+    el.ctaText.title = clean;
+
+    // Highlight @username, "QUOTED", and +120 PK / 3X tokens inline
+    const tokenRe = /(@[\p{L}\p{N}_.-]+|"[^"]+"|\+?\d[\d.]*\s*PK|\b[23]X\b)/giu;
+    let lastIdx = 0;
+    let match;
+    while ((match = tokenRe.exec(clean)) !== null) {
+      if (match.index > lastIdx) {
+        el.ctaText.appendChild(document.createTextNode(clean.slice(lastIdx, match.index)));
+      }
+      const tok = match[0];
+      let cls = 'speech-pts';
+      if (tok.startsWith('@')) cls = 'speech-user';
+      else if (tok.startsWith('"')) cls = 'speech-word';
+      el.ctaText.appendChild(makeEl('span', cls, tok));
+      lastIdx = tokenRe.lastIndex;
+    }
+    if (lastIdx < clean.length) {
+      el.ctaText.appendChild(document.createTextNode(clean.slice(lastIdx)));
+    }
+
+    if (changed) {
+      mascotReact(kind === 'gold' ? 'gold' : kind === 'find' ? 'found' : 'talk');
+    }
+  }
 
   function applySnapshot(snapshot, fxList) {
     if (!snapshot || !Array.isArray(snapshot.board) || !snapshot.golden) return;
@@ -725,6 +901,7 @@
     if (Number.isFinite(Number(snapshot.roundIdx))) state.roundIdx = Number(snapshot.roundIdx);
     state.phase = snapshot.phase || 'playing';
     state.animateId = snapshot.animateId || '';
+    const justFound = Boolean(snapshot.animateId);
     if (Array.isArray(snapshot.letters)) state.letters = snapshot.letters;
 
     state.board = snapshot.board.map((w) => ({
@@ -779,9 +956,21 @@
       state.themeId = snapshot.theme;
     }
 
-    if (snapshot.category) el.category.textContent = snapshot.category;
+    if (snapshot.category) {
+      el.category.textContent = String(snapshot.category)
+        .replace(/[^\p{L}\p{N}\s&().,'-]/gu, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    if (snapshot.mascot) {
+      if (mascotPixi) mascotPixi.setCharacter(snapshot.mascot);
+      if (el.mascotImg) {
+        el.mascotImg.src = snapshot.mascot === 'dog' ? '/art/dog-idle.png' : '/art/mascot-idle.png';
+      }
+    }
     renderLikes();
     renderMult();
+    renderGiftJar(snapshot);
 
     const lettersSig = state.letters.join('');
     if (lettersSig !== state.lettersSig) {
@@ -807,11 +996,10 @@
     }
 
     const cta = snapshot.cta || {};
-    el.ctaBar.className = `cta ${cta.kind || 'idle'}`;
-    el.ctaIcon.dataset.icon = cta.icon || '';
-    renderIcon(el.ctaIcon, cta.icon || '💬');
-    el.ctaText.textContent = cta.text || '';
-    el.ctaText.title = cta.text || '';
+    renderHostSpeech(cta.text || '', cta.kind || 'idle');
+    if (justFound) {
+      mascotReact(cta.kind === 'gold' ? 'gold' : 'found');
+    }
 
     const overlay = snapshot.overlay || {};
     const overlaySig = JSON.stringify(overlay);
@@ -1085,37 +1273,6 @@
       });
     }
 
-    if (el.musicBtn) {
-      el.musicBtn.addEventListener('click', () => {
-        SFX.unlock();
-        const on = SFX.toggleMusic();
-        el.musicBtn.textContent = on ? '⏸️ Muzikë' : '🔊 Muzikë';
-        updateNowPlaying();
-      });
-    }
-
-    try {
-      const stored = localStorage.getItem('fjalemania.volume');
-      let savedVolume = stored === null ? 55 : Number(stored);
-      if (!Number.isFinite(savedVolume)) savedVolume = 55;
-      if (el.musicVolume) el.musicVolume.value = String(savedVolume);
-      SFX.setMusicVolume(savedVolume / 100);
-    } catch {
-      SFX.setMusicVolume(0.55);
-    }
-
-    if (el.musicVolume) {
-      el.musicVolume.addEventListener('input', () => {
-        const value = Number(el.musicVolume.value);
-        SFX.setMusicVolume(value / 100);
-        try {
-          localStorage.setItem('fjalemania.volume', String(value));
-        } catch {
-          /* ignore storage errors */
-        }
-      });
-    }
-
     if (el.obsToggleBtn) {
       el.obsToggleBtn.addEventListener('click', () => {
         document.body.classList.toggle('obs-mode');
@@ -1159,14 +1316,6 @@
         if (url) copyText(url, el.copyPhoneBtn, 'Kopjo');
       });
     }
-    if (el.phoneMusicBtn) {
-      el.phoneMusicBtn.addEventListener('click', () => {
-        SFX.unlock();
-        const on = SFX.toggleMusic();
-        el.phoneMusicBtn.textContent = on ? '⏸️' : '🔊';
-        el.phoneMusicBtn.title = on ? 'Ndal muzikën' : 'Muzikë';
-      });
-    }
 
     if (el.phoneFullscreenBtn) {
       if (!document.documentElement.requestFullscreen) {
@@ -1195,11 +1344,6 @@
         sendBridgeEvent({ type: 'command', action: 'hint' });
       } else if (key === 'l') {
         sendBridgeEvent({ type: 'like', count: 500 });
-      } else if (key === 'm') {
-        SFX.unlock();
-        const on = SFX.toggleMusic();
-        if (el.musicBtn) el.musicBtn.textContent = on ? '⏸️ Muzikë' : '🔊 Muzikë';
-        updateNowPlaying();
       } else if (key === 'e') {
         sendBridgeEvent({ type: 'gift', user: currentTestUser(), giftName: 'finger heart' });
       } else if (key === 'o') {
@@ -1215,6 +1359,35 @@
       likesBlock.addEventListener('click', () => {
         SFX.unlock();
         sendBridgeEvent({ type: 'like', count: 15 });
+      });
+    }
+
+    if (el.likesPillBox) {
+      el.likesPillBox.addEventListener('click', () => {
+        SFX.unlock();
+        sendBridgeEvent({ type: 'like', count: 25 });
+      });
+    }
+
+    if (el.wheelShuffleBtn) {
+      el.wheelShuffleBtn.addEventListener('click', () => {
+        SFX.unlock();
+        SFX.playShuffle();
+        shuffleWheelAngles();
+      });
+    }
+
+    if (el.orbHintBtn && !phoneMode) {
+      el.orbHintBtn.addEventListener('click', () => {
+        SFX.unlock();
+        sendBridgeEvent({ type: 'command', action: 'hint' });
+      });
+    }
+
+    if (el.orbMultBtn && !phoneMode) {
+      el.orbMultBtn.addEventListener('click', () => {
+        SFX.unlock();
+        sendBridgeEvent({ type: 'command', action: 'frenzy' });
       });
     }
 
@@ -1290,39 +1463,10 @@
     if (Number.isFinite(season) && season >= 2) {
       sendBridgeEvent({ type: 'command', action: 'setSeason', value: Math.floor(season) });
     }
-    wantsMusic = params.get('music') === '1';
     phoneMode = params.get('phone') === '1';
     obsPage = params.get('obs') === '1' || params.get('obs') === 'true';
     urlTikTokUser = (params.get('user') || '').replace(/^@+/, '').trim();
     if (phoneMode) document.body.classList.add('phone-mode');
-  }
-
-  function updateNowPlaying() {
-    const song = SFX.getCurrentSong();
-    if (!song || !song.name) return;
-    el.nowPlaying.textContent = `🎵 ${song.name}`;
-    el.nowPlaying.title = song.name;
-    if (el.phoneMusicBtn) el.phoneMusicBtn.title = song.name;
-  }
-
-  async function loadMusicLibrary() {
-    try {
-      const res = await fetch('/api/music', { cache: 'no-store' });
-      const data = await res.json();
-      const tracks = Array.isArray(data.tracks) ? data.tracks : [];
-      SFX.setPlaylist(tracks);
-    } catch {
-      SFX.setPlaylist([]);
-    }
-    updateNowPlaying();
-    if (wantsMusic) {
-      SFX.startMusic();
-      if (el.musicBtn) el.musicBtn.textContent = '⏸️ Muzikë';
-      updateNowPlaying();
-    }
-    if (el.phoneMusicBtn) {
-      el.phoneMusicBtn.textContent = SFX.musicEnabled ? '⏸️' : '🔊';
-    }
   }
 
   async function loadNetworkInfo() {
@@ -1358,7 +1502,7 @@
     buildStaticUi();
     applyUrlFlags();
     wireControls();
-    SFX.onTrackChange = updateNowPlaying;
+    preferArt();
 
     if (phoneMode) {
       showSpectatorWaiting();
@@ -1405,7 +1549,6 @@
       .catch(() => {});
 
     fitStage();
-    loadMusicLibrary();
     loadNetworkInfo();
 
     window.FJALEMANIA = {

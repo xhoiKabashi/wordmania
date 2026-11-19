@@ -36,27 +36,13 @@
   ];
 
   const THEMES = [
-    { id: 'theme-kuqezi', name: 'Kuq e Zi VIP', badge: '🇦🇱 Kuq e Zi' },
-    { id: 'theme-ksamil', name: 'Ksamil Riviera', badge: '🌊 Ksamil Blu' },
-    { id: 'theme-prishtina-neon', name: 'Prishtina Neon', badge: '⚡ Neon Violet' },
-    { id: 'theme-valbona', name: 'Alpet e Valbonës', badge: '🌲 Emerald' },
-    { id: 'theme-tirana-gold', name: 'Blloku Gold', badge: '👑 Gold Luxury' },
-    { id: 'theme-matrix-shqip', name: 'Cyber Shqip', badge: '💚 Cyber Matrix' }
-  ];
-
-  const SONGS = [
-    { id: 0, name: 'Valle Elektronike (Tallava Trap)', bpm: 128 },
-    { id: 1, name: 'Tirana Drill & 808', bpm: 136 },
-    { id: 2, name: 'Ksamil Sunset Lofi', bpm: 94 },
-    { id: 3, name: 'Çifteli Synthwave', bpm: 134 },
-    { id: 4, name: 'Shkodra Retro Arcade', bpm: 142 },
-    { id: 5, name: 'Kuq e Zi Stadium Anthem', bpm: 124 }
+    { id: 'theme-kuqezi', name: 'Kuq e Zi VIP', badge: '🇦🇱 Kuq e Zi' }
   ];
 
   const ROUNDS = [
     {
       id: 1,
-      category: 'Shqipëria & Kombi 🇦🇱',
+      category: 'Shqipëria & Kombi',
       letters: ['S', 'H', 'Q', 'I', 'P', 'Ë', 'R', 'I', 'A'],
       words: [
         'SHI', 'ARI', 'ERA', 'HAPI', 'PARË', 'PASHË', 'PESHQ', 'SHQIP',
@@ -72,7 +58,7 @@
     },
     {
       id: 2,
-      category: 'Deti & Riviera (Ksamil) 🌊',
+      category: 'Deti & Riviera (Ksamil)',
       letters: ['D', 'E', 'T', 'I', 'V', 'A', 'L', 'Ë', 'R'],
       words: [
         'DET', 'ARI', 'ART', 'ERË', 'VIT', 'DITA', 'VERA', 'VALË',
@@ -91,7 +77,7 @@
     },
     {
       id: 3,
-      category: 'Sofra & Ushqimi Shqiptar 🥧',
+      category: 'Sofra & Ushqimi Shqiptar',
       letters: ['B', 'U', 'K', 'Ë', 'R', 'Y', 'E', 'T', 'A'],
       words: [
         'BUKË', 'URË', 'BUTË', 'URTË', 'TUBË', 'KRYE', 'BËRË', 'BYREK',
@@ -107,7 +93,7 @@
     },
     {
       id: 4,
-      category: 'Muzika & Festa 🎶',
+      category: 'Muzika & Festa',
       letters: ['K', 'Ë', 'N', 'G', 'A', 'V', 'L', 'L', 'E'],
       words: [
         'LEK', 'KALË', 'VLEN', 'KËNGË', 'KËNGA', 'VËLLA', 'VALLE',
@@ -120,7 +106,7 @@
     },
     {
       id: 5,
-      category: 'Familja & Zemra ❤️',
+      category: 'Familja & Zemra',
       letters: ['Z', 'E', 'M', 'Ë', 'R', 'N', 'A', 'T', 'D'],
       words: [
         'NATË', 'DERË', 'MEND', 'NDER', 'EMËR', 'ZEMËR', 'ZEMRA', 'EMRAT',
@@ -135,7 +121,7 @@
     },
     {
       id: 6,
-      category: 'Qytetet & Trojet 🏙️',
+      category: 'Qytetet & Trojet',
       letters: ['T', 'I', 'R', 'A', 'N', 'A', 'K', 'O', 'V'],
       words: [
         'ORA', 'TOKA', 'NATA', 'ARKA', 'VOTA', 'KOT', 'ORTAK', 'TRIO',
@@ -151,7 +137,7 @@
     },
     {
       id: 7,
-      category: 'Natyra & Alpet Shqiptare 🏔️',
+      category: 'Natyra & Alpet Shqiptare',
       letters: ['M', 'A', 'L', 'I', 'F', 'U', 'S', 'H', 'Ë'],
       words: [
         'MAL', 'SHI', 'MALI', 'LUMI', 'SHIU', 'FLAS', 'FUSHA', 'SHUMË',
@@ -166,7 +152,7 @@
     },
     {
       id: 8,
-      category: 'Sporti & Kampionët ⚽',
+      category: 'Sporti & Kampionët',
       letters: ['F', 'I', 'T', 'O', 'R', 'E', 'G', 'L', 'A'],
       words: [
         'FAT', 'GOL', 'LIGA', 'GARË', 'GOLI', 'FORTË', 'GOLFI', 'FLOTA',
@@ -182,7 +168,7 @@
     },
     {
       id: 9,
-      category: 'Diaspora & Mërgimi ✈️',
+      category: 'Diaspora & Mërgimi',
       letters: ['M', 'Ë', 'R', 'G', 'I', 'M', 'T', 'A', 'R'],
       words: [
         'RRI', 'TRIM', 'MAMI', 'MIRË', 'EMRI', 'TRIMA', 'MARRË', 'MËRGIM',
@@ -196,7 +182,7 @@
     },
     {
       id: 10,
-      category: 'Dashuria & Nata Romantike 💕',
+      category: 'Dashuria & Nata Romantike',
       letters: ['D', 'A', 'S', 'H', 'U', 'R', 'I', 'J', 'Ë'],
       words: [
         'DUA', 'UJË', 'DRU', 'ERA', 'RUAJ', 'DUAJ', 'DASHI', 'SHUAJ',
@@ -212,7 +198,7 @@
     },
     {
       id: 11,
-      category: 'Kafe & Biseda (Blloku) ☕',
+      category: 'Kafe & Biseda (Blloku)',
       letters: ['K', 'A', 'F', 'E', 'B', 'I', 'S', 'D', 'Ë'],
       words: [
         'FIK', 'FIS', 'KAFE', 'BESA', 'SKEDË', 'BESË',
@@ -224,7 +210,7 @@
     },
     {
       id: 12,
-      category: 'Pazari i Vjetër & Çarshia 🏮',
+      category: 'Pazari i Vjetër & Çarshia',
       letters: ['Ç', 'A', 'R', 'S', 'H', 'I', 'P', 'Ë', 'T'],
       words: [
         'HAP', 'ÇATI', 'SHIT', 'PRIT', 'SHPIRT', 'SHTËPI', 'TRASHË', 'ÇARË',
@@ -237,7 +223,7 @@
     },
     {
       id: 13,
-      category: 'Shkolla & Libri 📚',
+      category: 'Shkolla & Libri',
       letters: ['L', 'I', 'B', 'Ë', 'R', 'S', 'H', 'K', 'A'],
       words: [
         'LIBËR', 'LIBRA', 'KLASË', 'KISHË', 'KISHA', 'SHKEL', 'SHKELA',
@@ -251,7 +237,7 @@
     },
     {
       id: 14,
-      category: 'Bujqësia & Kopshti 🌱',
+      category: 'Bujqësia & Kopshti',
       letters: ['T', 'R', 'A', 'K', 'O', 'L', 'P', 'Ë', 'S'],
       words: [
         'TOKA', 'LOPA', 'LOPË', 'PELA', 'KOSA', 'KOSË', 'KOSAT',
@@ -266,7 +252,7 @@
     },
     {
       id: 15,
-      category: 'Udhëtimi & Transporti ✈️',
+      category: 'Udhëtimi & Transporti',
       letters: ['A', 'V', 'I', 'O', 'N', 'T', 'R', 'E', 'S'],
       words: [
         'AVION', 'TREN', 'TRENI', 'VIT', 'VITE', 'VERA', 'VOTA', 'NOTA',
@@ -279,7 +265,7 @@
     },
     {
       id: 16,
-      category: 'Puna & Zanati 🛠️',
+      category: 'Puna & Zanati',
       letters: ['A', 'K', 'N', 'O', 'P', 'R', 'T', 'U', 'Ë'],
       words: [
         'PUNË', 'PUNA', 'PUNËTOR', 'PËR', 'POR', 'PORTA', 'PORT', 'PARK',
@@ -295,7 +281,7 @@
     },
     {
       id: 17,
-      category: 'Lojërat & Argëtimi 🎲',
+      category: 'Lojërat & Argëtimi',
       letters: ['L', 'O', 'J', 'Ë', 'R', 'A', 'T', 'I', 'M'],
       words: [
         'LOJË', 'LOJA', 'LOJËRA', 'LOJËRAT', 'LOJTAR', 'LOJTARI', 'LOJTARE',
@@ -313,7 +299,7 @@
     },
     {
       id: 18,
-      category: 'Shtëpia & Banesa 🏠',
+      category: 'Shtëpia & Banesa',
       letters: ['S', 'H', 'T', 'Ë', 'P', 'I', 'A', 'D', 'R'],
       words: [
         'SHTËPI', 'SHTËPIA', 'SHPIRT', 'SHPAT', 'STREHA',
@@ -328,7 +314,7 @@
     },
     {
       id: 19,
-      category: 'Rrobat & Moda 👗',
+      category: 'Rrobat & Moda',
       letters: ['R', 'R', 'O', 'B', 'A', 'T', 'Ë', 'S', 'H'],
       words: [
         'RROBA', 'RROBAT', 'RROBË', 'RROTA',
@@ -342,7 +328,7 @@
     },
     {
       id: 20,
-      category: 'Kafshët & Fshati 🐄',
+      category: 'Kafshët & Fshati',
       letters: ['K', 'A', 'F', 'S', 'H', 'Ë', 'T', 'I', 'R'],
       words: [
         'KAFSHË', 'KAFSHËT', 'FSHAT', 'FSHATI', 'FIK', 'FIS', 'FISE', 'FISET',
@@ -358,7 +344,7 @@
     },
     {
       id: 21,
-      category: 'Kinema & Filmat 🎬',
+      category: 'Kinema & Filmat',
       letters: ['F', 'I', 'L', 'M', 'A', 'S', 'H', 'Ë', 'T'],
       words: [
         'FILM', 'FILMA', 'FILMAT', 'FLAS', 'FLET', 'FLETA', 'FLE',
@@ -372,7 +358,7 @@
     },
     {
       id: 22,
-      category: 'Festat & Traditat 🎉',
+      category: 'Festat & Traditat',
       letters: ['F', 'E', 'S', 'T', 'I', 'V', 'A', 'L', 'Ë'],
       words: [
         'FESTIVAL', 'FESTË', 'FESTA', 'FAT', 'FATI', 'FAL', 'FALS', 'FIS',
@@ -386,7 +372,7 @@
     },
     {
       id: 23,
-      category: 'Lulet & Bimët 🌸',
+      category: 'Lulet & Bimët',
       letters: ['L', 'U', 'L', 'E', 'T', 'Ë', 'R', 'I', 'A'],
       words: [
         'LULE', 'LULET', 'TULLË', 'TELA', 'TELI',
@@ -400,7 +386,7 @@
     },
     {
       id: 24,
-      category: 'Bora & Dimri ❄️',
+      category: 'Bora & Dimri',
       letters: ['D', 'Ë', 'B', 'O', 'R', 'Ë', 'S', 'H', 'I'],
       words: [
         'DËBORË', 'DËSHIRË', 'BORË', 'SHI', 'ERË', 'ORË', 'DORË',
@@ -481,39 +467,36 @@
   const GIFTS = [
     {
       id: 'hint',
-      emoji: '🚀',
-      name: 'Rocket · Raketë',
-      effect: 'Zbulo 2 shkronja',
+      emoji: '🪙',
+      badgeNum: '1',
+      badgeUnit: 'COIN',
+      name: 'ZBULON 1 SHKRONJË',
+      effect: 'Çdo dhuratë me vlerë 1 monedhë',
       points: 100,
-      coins: 5,
-      aliases: ['rocket', 'raket', 'rakete', 'raketë', 'hint', 'lightning', 'rrufe']
-    },
-    {
-      id: 'theme',
-      emoji: '🌹',
-      name: 'Rose · Trëndafil',
-      effect: 'Ndryshon ngjyrat e lojës',
-      points: 30,
       coins: 1,
-      aliases: ['rose', 'roze', 'trendafil', 'trëndafil', 'ngjyr', 'color', 'background']
-    },
-    {
-      id: 'song',
-      emoji: '🎵',
-      name: 'TikTok',
-      effect: 'Ndryshon këngën e lojës',
-      points: 50,
-      coins: 1,
-      aliases: ['tiktok', 'music', 'song', 'keng', 'kenge']
+      aliases: ['1', 'rose', 'trandafil', 'tiktok', 'heart', 'gg', 'ice cream', 'akullore', 'hint', 'coin', '1 coin']
     },
     {
       id: 'eagle',
-      emoji: '🫰',
-      name: 'Finger Heart · Zemër me gishta',
-      effect: '3X pikë VIP 45s + 1 fjalë',
-      points: 200,
+      emoji: '🪙',
+      badgeNum: '5',
+      badgeUnit: 'COINS',
+      name: 'ZBULON 1 FJALË',
+      effect: 'Çdo dhuratë 5 monedha hap 1 fjalë',
+      points: 300,
       coins: 5,
-      aliases: ['finger heart', 'finger', 'heart', 'zemer', 'zemër', 'gisht', 'eagle', 'lion', 'galaxy', 'universe', 'castle', 'crown', 'shqiponj', 'vip']
+      aliases: ['5', 'finger heart', 'finger', 'zemer', 'zemër', 'gisht', 'mic', 'panda', '5 coins', 'word', 'eagle']
+    },
+    {
+      id: 'mascot',
+      emoji: '🪙',
+      badgeNum: '10+',
+      badgeUnit: 'COINS',
+      name: 'NDRYSHON MACE ↔ QEN',
+      effect: 'Çdo dhuratë 10+ ndërron maskotën',
+      points: 600,
+      coins: 10,
+      aliases: ['10', 'corgi', 'dog', 'qen', 'qeni', 'cat', 'mace', 'mascot', 'maskot', 'rosa', 'donut', 'doughnut', 'perfume', 'hat', 'cap', 'rocket', 'raket', 'lion', 'galaxy', '10 coins']
     }
   ];
 
@@ -531,7 +514,6 @@
     canFormWord,
     TEAMS,
     THEMES,
-    SONGS,
     ROUNDS,
     VIEWERS_POOL,
     GIFTS,
