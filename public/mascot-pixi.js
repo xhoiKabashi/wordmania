@@ -9,8 +9,8 @@
 (function () {
   'use strict';
 
-  const W = 240;
-  const H = 206;
+  const W = 300;
+  const H = 258;
 
   const CHARACTER_SETS = {
     cat: {
@@ -67,10 +67,10 @@
     view.setAttribute('aria-hidden', 'true');
     hostEl.appendChild(view);
 
-    const anchorX = 112;
-    const anchorY = 200;
-    const charW = 174;
-    const charH = 200;
+    const anchorX = 141;
+    const anchorY = 250;
+    const charW = 217;
+    const charH = 250;
 
     const root = new window.PIXI.Container();
     root.pivot.set(anchorX, anchorY);
@@ -129,9 +129,9 @@
 
     // 3 Golden Comic Action Rays
     const raySpecs = [
-      { pts: '188,36 212,15 220,26 194,43', px: 191, py: 39 },
-      { pts: '198,53 228,45 230,56 200,61', px: 199, py: 57 },
-      { pts: '196,71 225,71 223,82 195,78', px: 196, py: 75 }
+      { pts: '235,45 266,18 275,32 243,53', px: 239, py: 48 },
+      { pts: '247,66 285,56 288,70 250,77', px: 249, py: 71 },
+      { pts: '245,89 281,89 279,103 244,98', px: 245, py: 94 }
     ];
     const rays = raySpecs.map((spec) => {
       const sp = new window.PIXI.Sprite(makeRayTexture(spec.pts));

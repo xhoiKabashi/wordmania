@@ -17,6 +17,26 @@
  */
 
 const http = require('http');
+const path = require('path');
+const { normalizeGuess } = require(path.join(__dirname, '..', 'engine.js'));
+
+let maxPoolWordLen = 9;
+try {
+  require(path.join(__dirname, '..', 'public', 'words-al.js'));
+  const data = globalThis.ALBANIAN_DATA;
+  if (data && Array.isArray(data.ROUNDS) && typeof data.normalizeAlbanian === 'function') {
+    let longest = 0;
+    for (const r of data.ROUNDS) {
+      for (const w of [...(r.words || []), ...(r.bonus || [])]) {
+        const len = data.normalizeAlbanian(w).length;
+        if (len > longest) longest = len;
+      }
+    }
+    if (longest >= 2) maxPoolWordLen = longest;
+  }
+} catch {
+  /* fallback to default 9 */
+}
 let connector;
 try {
   connector = require('tiktok-live-connector');
@@ -63,17 +83,6 @@ function extractTikTokUser(data) {
   return { userId, nickname };
 }
 
-function mapTikTokChat(data) {
-  const user = extractTikTokUser(data);
-  const text = String(data?.content ?? data?.comment ?? '').trim();
-  if (!text) return null;
-  return {
-    user: user ? user.userId : 'Viewer',
-    nickname: user ? user.nickname : 'Viewer',
-    text
-  };
-}
-
 let lastTotalLikes = 0;
 function mapTikTokLike(data) {
   const user = extractTikTokUser(data);
@@ -117,15 +126,18 @@ function mapTikTokGift(data) {
   };
 }
 
+const SERVER_TARGET = new URL(SERVER_URL);
+const KEEP_ALIVE_AGENT = new http.Agent({ keepAlive: true, maxSockets: 4 });
+
 function postEvent(payload) {
   const data = JSON.stringify(payload);
-  const u = new URL(SERVER_URL);
   const req = http.request(
     {
-      hostname: u.hostname,
-      port: u.port || 80,
-      path: u.pathname,
+      hostname: SERVER_TARGET.hostname,
+      port: SERVER_TARGET.port || 80,
+      path: SERVER_TARGET.pathname,
       method: 'POST',
+      agent: KEEP_ALIVE_AGENT,
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(data)
@@ -164,14 +176,18 @@ tiktok
   });
 
 tiktok.on(WebcastEvent.CHAT || 'chat', (data) => {
-  const msg = mapTikTokChat(data);
-  if (!msg) return;
+  const rawText = data?.content ?? data?.comment;
+  const norm = normalizeGuess(rawText, maxPoolWordLen);
+  if (!norm) return;
+  const user = extractTikTokUser(data);
+  const userId = user ? user.userId : 'Viewer';
+  const text = String(rawText).trim();
   postEvent({
     type: 'comment',
-    user: msg.user,
-    text: msg.text
+    user: userId,
+    text
   });
-  console.log(`[Koment] @${msg.user}: "${msg.text}"`);
+  console.log(`[Koment] @${userId}: "${text}"`);
 });
 
 tiktok.on(WebcastEvent.LIKE || 'like', (data) => {

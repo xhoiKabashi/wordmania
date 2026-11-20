@@ -172,20 +172,14 @@
               <span class="pill mult" id="multPill" style="display:none" aria-hidden="true">1X</span>
             </div>
 
-            <div class="likes">
-              <div class="likes-track">
-                <div class="likes-fill" id="likesFill"></div>
-                <span class="likes-goal" id="likesGoal">0 / 200 → ZBULON 1 SHKRONJË</span>
-              </div>
-              <div class="round-track"><div class="round-fill" id="roundFill"></div></div>
-            </div>
+            <div class="round-track"><div class="round-fill" id="roundFill"></div></div>
 
             <section class="top3-panel" aria-label="Top 3 lojtarët">
               <div class="top3" id="top3Strip"></div>
             </section>
           </header>
 
-          <!-- MASCOT + SPEECH BUBBLE HERO (Peeking right over the Qilim Board) -->
+          <!-- MASCOT + SPEECH BUBBLE + LIKES VASE HERO (Peeking right over the Qilim Board) -->
           <div class="host-strip" id="hostStrip">
             <div class="mascot" id="mascot" aria-hidden="true">
               <img id="mascotImg" src="/art/mascot-idle.png" alt="" draggable="false" />
@@ -195,6 +189,39 @@
               <div class="speech-bubble" id="ctaBar" role="status" aria-live="polite">
                 <p class="cta-text" id="ctaText">Gjeni fjalët shqipe nga shkronjat poshtë dhe shkruajini në koment</p>
               </div>
+            </div>
+
+            <div class="likes likes-vase-wrap" title="Kliko për të shtuar likes ❤️">
+              <div class="likes-vase-funnel" aria-hidden="true">
+                <svg class="ui-ico funnel-heart h1"><use href="#ico-heart"/></svg>
+                <svg class="ui-ico funnel-heart h2"><use href="#ico-heart"/></svg>
+                <svg class="ui-ico funnel-heart h3"><use href="#ico-heart"/></svg>
+              </div>
+              <div class="likes-vase-neck">
+                <span class="likes-vase-tag">❤️ LIKES</span>
+              </div>
+              <div class="likes-vase">
+                <span class="likes-vase-handle left" aria-hidden="true"></span>
+                <span class="likes-vase-handle right" aria-hidden="true"></span>
+                <div class="likes-vase-glass">
+                  <div class="likes-fill" id="likesFill">
+                    <div class="likes-wave"></div>
+                    <span class="likes-bubble b1"></span>
+                    <span class="likes-bubble b2"></span>
+                    <span class="likes-bubble b3"></span>
+                  </div>
+                  <div class="likes-vase-shine" aria-hidden="true"></div>
+                  <div class="likes-vase-ticks" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <div class="likes-vase-content">
+                    <svg class="ui-ico likes-vase-heart" aria-hidden="true"><use href="#ico-heart"/></svg>
+                    <span class="likes-goal" id="likesGoal">0/200</span>
+                    <span class="likes-vase-sub">ZBULON 1 SHKRONJË</span>
+                  </div>
+                </div>
+              </div>
+              <div class="likes-vase-base" aria-hidden="true"></div>
             </div>
           </div>
 
@@ -229,17 +256,12 @@
             <div class="letter-bank" id="letterBank"></div>
           </section>
 
-          <!-- BOTTOM ZONE: Dark left area for TikTok comments, right column for Coin-Farming Gifts -->
-          <div class="bottom-zone">
-            <div class="comment-space" aria-hidden="true"></div>
-            <div class="side-stack gift-panel">
-              <div class="gift-panel-head">
-                <span class="gift-panel-title">DHURATAT · FITO PIKË</span>
-                <span class="gift-panel-bonus">BONUS <b id="jarCount">0</b>/<b id="jarGoal">5</b> → 3X</span>
-              </div>
-              <div class="gift-legend" id="giftLegend"></div>
-            </div>
-          </div>
+          <!-- STANDALONE GIFTS SHOWCASE (Clean, big, centered, no wrapper box) -->
+          <section class="bottom-zone gifts-standalone" aria-label="Dhuratat TikTok">
+            <div class="gift-legend" id="giftLegend"></div>
+            <span id="jarCount" style="display:none" aria-hidden="true">0</span>
+            <span id="jarGoal" style="display:none" aria-hidden="true">5</span>
+          </section>
         </div>
 
         <!-- ROUND RESULT OVERLAY -->

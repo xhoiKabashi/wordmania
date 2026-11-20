@@ -401,9 +401,10 @@
     const goal = state.likeGoal || CFG.likeGoalStart;
     const progress = Math.max(0, Math.min(goal, state.likesProgress));
     const level = Math.max(1, Math.round((goal - CFG.likeGoalStart) / CFG.likeGoalStep) + 1);
-    el.likesFill.style.width = `${(progress / goal) * 100}%`;
+    const pct = (progress / goal) * 100;
+    el.likesFill.style.height = `${pct}%`;
     el.likesLevel.textContent = `NIV ${level}`;
-    el.likesGoal.textContent = `${fmt(progress)} / ${fmt(goal)} → ZBULON 1 SHKRONJË`;
+    el.likesGoal.textContent = `${fmt(progress)}/${fmt(goal)}`;
     if (el.orbLikesCount) {
       el.orbLikesCount.textContent = `${fmt(Math.max(0, goal - progress))}`;
     }
@@ -623,9 +624,7 @@
       const text = makeEl('span', 'gift-text');
       text.append(makeEl('b', '', g.name), makeEl('small', '', g.effect));
 
-      const pts = makeEl('span', 'gift-pts', `+${fmt(g.points)} PK`);
-
-      chip.append(badge, text, pts);
+      chip.append(badge, text);
       el.giftLegend.appendChild(chip);
     });
 
@@ -714,15 +713,16 @@
           break;
         case 'like_bump': {
           const count = Number(item.count) || 1;
-          if (el.likesTotal) {
-            burstAt(el.likesTotal, Math.min(8, Math.max(2, Math.round(Math.min(count, 80) / 10))), '❤️');
-            el.likesTotal.classList.remove('like-bump');
-            void el.likesTotal.offsetWidth;
-            el.likesTotal.classList.add('like-bump');
+          const vaseNode = document.querySelector('.likes-vase') || el.likesTotal;
+          if (vaseNode) {
+            burstAt(vaseNode, Math.min(8, Math.max(2, Math.round(Math.min(count, 80) / 10))), '❤️');
+            vaseNode.classList.remove('like-bump');
+            void vaseNode.offsetWidth;
+            vaseNode.classList.add('like-bump');
           }
           if (item.revealed > 0) {
             SFX.playLikeMilestone();
-            burstAt(el.ctaBar, 12, '❤️');
+            burstAt(vaseNode || el.ctaBar, 14, '❤️');
             burstAt(el.letterBank, 10);
           }
           break;

@@ -6,6 +6,34 @@
    render snapshots and play FX events from this engine.
    ============================================================ */
 
+/**
+ * Normalize an incoming chat comment into uppercase Albanian ASCII (Ë->E, Ç->C)
+ * while aborting early if length is outside [2, maxLen].
+ */
+function normalizeGuess(raw, maxLen) {
+  if (raw === undefined || raw === null) return '';
+  const str = String(raw).trim();
+  const limit = maxLen > 0 ? maxLen : 9;
+  if (str.length < 2 || str.length > limit * 2 + 2) return '';
+  let out = '';
+  for (let i = 0; i < str.length; i++) {
+    const c = str.charCodeAt(i);
+    if (c >= 65 && c <= 90) {
+      out += str[i];
+    } else if (c >= 97 && c <= 122) {
+      out += String.fromCharCode(c - 32);
+    } else if (c === 203 || c === 235) {
+      out += 'E';
+    } else if (c === 199 || c === 231) {
+      out += 'C';
+    } else {
+      continue;
+    }
+    if (out.length > limit) return '';
+  }
+  return out.length >= 2 ? out : '';
+}
+
 function createGameEngine(opts = {}) {
   const DATA = opts.data || globalThis.ALBANIAN_DATA || {};
   const emit = typeof opts.onBroadcast === 'function' ? opts.onBroadcast : () => {};
@@ -26,6 +54,15 @@ function createGameEngine(opts = {}) {
             .replace(/Ë/g, 'E')
             .replace(/Ç/g, 'C')
             .replace(/[^A-Z]/g, '');
+
+  function hasOnlyPoolLetters(norm, mask) {
+    if (!mask) return true;
+    for (let i = 0; i < norm.length; i++) {
+      const bit = norm.charCodeAt(i) - 65;
+      if (bit < 0 || bit >= 26 || (mask & (1 << bit)) === 0) return false;
+    }
+    return true;
+  }
 
   const CFG = {
     roundSeconds: 90,
@@ -58,6 +95,10 @@ function createGameEngine(opts = {}) {
     phase: 'playing', // playing | ending | ended
     board: [],
     golden: null,
+    boardIndex: new Map(),
+    minWordLen: 2,
+    maxWordLen: 9,
+    letterMask: 0,
     letters: [],
     bonusPool: new Map(),
     mainBonusSet: new Set(),
@@ -544,6 +585,36 @@ function createGameEngine(opts = {}) {
       }
     }
 
+    state.boardIndex = new Map();
+    let minLen = Infinity;
+    let maxLen = 0;
+    for (const entry of state.board) {
+      state.boardIndex.set(entry.norm, entry);
+      if (entry.norm.length < minLen) minLen = entry.norm.length;
+      if (entry.norm.length > maxLen) maxLen = entry.norm.length;
+    }
+    if (state.golden) {
+      state.boardIndex.set(state.golden.norm, state.golden);
+      if (state.golden.norm.length < minLen) minLen = state.golden.norm.length;
+      if (state.golden.norm.length > maxLen) maxLen = state.golden.norm.length;
+    }
+    for (const key of state.bonusPool.keys()) {
+      if (key.length < minLen) minLen = key.length;
+      if (key.length > maxLen) maxLen = key.length;
+    }
+    state.minWordLen = Number.isFinite(minLen) ? Math.max(2, minLen) : 2;
+    state.maxWordLen = maxLen >= 2 ? maxLen : Math.max(2, state.letters.length || 9);
+
+    let mask = 0;
+    for (const ch of state.letters) {
+      const n = normalizeAlbanian(ch);
+      for (let i = 0; i < n.length; i++) {
+        const bit = n.charCodeAt(i) - 65;
+        if (bit >= 0 && bit < 26) mask |= 1 << bit;
+      }
+    }
+    state.letterMask = mask;
+
     pushFx({ kind: 'shuffle' });
     showIdleCta(false);
     if (shouldFlush) flushState();
@@ -767,111 +838,91 @@ function createGameEngine(opts = {}) {
     if (comboLevel >= 2) pushFx({ kind: 'combo', level: comboLevel });
   }
 
-  function handleComment(rawUser, rawText, forcedTeam, simulated) {
-    if (state.phase !== 'playing') return false;
-    const text = String(rawText || '').trim();
-    if (!text) return false;
-    if (!simulated) {
-      const before = solvedCount();
-      const handled = handleCommentCore(rawUser, text, forcedTeam);
-      if (!teamJoin(text)) pushChat(cleanUser(rawUser), text, solvedCount() > before);
-      return handled;
-    }
-    return handleCommentCore(rawUser, text, forcedTeam);
+  function filterComment(rawText) {
+    if (state.phase !== 'playing') return '';
+    return normalizeGuess(rawText, state.maxWordLen);
   }
 
-  function handleCommentCore(rawUser, rawText, forcedTeam) {
+  function handleComment(rawUser, rawText, forcedTeam, simulated, preNorm) {
     if (state.phase !== 'playing') return false;
+    const norm = preNorm || normalizeGuess(rawText, state.maxWordLen);
+    if (!norm) return false;
     const text = String(rawText || '').trim();
-    if (!text) return false;
+    if (!simulated) {
+      const before = solvedCount();
+      const handled = handleCommentCore(rawUser, text, forcedTeam, norm);
+      if (handled) pushChat(cleanUser(rawUser), text, solvedCount() > before);
+      return handled;
+    }
+    return handleCommentCore(rawUser, text, forcedTeam, norm);
+  }
 
-    const user = cleanUser(rawUser);
-    const team = teamOf(text) || forcedTeam || '';
-    const player = getOrCreatePlayer(user, team);
-    const norm = normalizeAlbanian(text);
+  function handleCommentCore(rawUser, text, forcedTeam, norm) {
+    if (text.charCodeAt(0) === 35) {
+      const join = teamJoin(text);
+      if (join) {
+        const user = cleanUser(rawUser);
+        getOrCreatePlayer(user, join.id);
+        if (maybeAnnounce(join.flag, `@${user} u bashkua me ${join.label}!`, 'gift')) return true;
+        return false;
+      }
+    }
 
-    const join = teamJoin(text);
-    if (join) {
-      if (maybeAnnounce(join.flag, `@${user} u bashkua me ${join.label}!`, 'gift')) return true;
+    if (norm.length < state.minWordLen || !hasOnlyPoolLetters(norm, state.letterMask)) {
       return false;
     }
-    if (!norm) return false;
 
-    let target = norm.length <= 28 ? [state.golden, ...state.board].find((w) => !w.solved && w.norm === norm) : null;
-
-    const tokens = text
-      .split(/[\s,.;:!?+*#_~-]+/)
-      .map((t) => normalizeAlbanian(t))
-      .filter((t) => t.length >= 2 && t.length <= 28);
-
-    if (!target) {
-      for (const tok of tokens) {
-        target = [state.golden, ...state.board].find((w) => !w.solved && w.norm === tok);
-        if (target) break;
+    const entry = state.boardIndex.get(norm);
+    if (entry) {
+      const user = cleanUser(rawUser);
+      if (!entry.solved) {
+        const player = getOrCreatePlayer(user, forcedTeam || teamOf(text));
+        solveByPlayer(entry, player);
+        return true;
       }
+      const who = entry.finder ? ` nga @${entry.finder}` : '';
+      return maybeAnnounce('', `@${user}, fjala "${entry.raw}" është gjetur më parë${who}`, 'warn');
     }
 
-    if (target) {
-      solveByPlayer(target, player);
-      return true;
-    }
+    const bonusRaw = state.bonusPool.get(norm);
+    if (bonusRaw !== undefined && !state.foundBonus.has(norm)) {
+      const user = cleanUser(rawUser);
+      const player = getOrCreatePlayer(user, forcedTeam || teamOf(text));
+      const rawChars = Array.from(String(bonusRaw).toUpperCase());
 
-    let already = norm.length <= 28 ? [state.golden, ...state.board].find((w) => w.solved && w.norm === norm) : null;
-    if (!already) {
-      for (const tok of tokens) {
-        already = [state.golden, ...state.board].find((w) => w.solved && w.norm === tok);
-        if (already) break;
-      }
-    }
-    if (already) {
-      const who = already.finder ? ` nga @${already.finder}` : '';
-      return maybeAnnounce('', `@${user}, fjala "${already.raw}" është gjetur më parë${who}`, 'warn');
-    }
-
-    let bonusHit = norm.length <= 28 && state.bonusPool.has(norm) && !state.foundBonus.has(norm) ? norm : null;
-    if (!bonusHit) {
-      for (const tok of tokens) {
-        if (state.bonusPool.has(tok) && !state.foundBonus.has(tok)) {
-          bonusHit = tok;
-          break;
-        }
-      }
-    }
-
-    if (bonusHit) {
-      const raw = state.bonusPool.get(bonusHit);
-      const rawChars = Array.from(String(raw).toUpperCase());
-
-      if (state.mainBonusSet.has(bonusHit)) {
+      if (state.mainBonusSet.has(norm)) {
         const swapSlot = state.board.find((w) => !w.solved && w.hinted.size === 0 && w.chars.length === rawChars.length);
         if (swapSlot) {
-          state.bonusPool.delete(bonusHit);
-          state.mainBonusSet.delete(bonusHit);
+          state.bonusPool.delete(norm);
+          state.mainBonusSet.delete(norm);
+          state.boardIndex.delete(swapSlot.norm);
           if (!state.foundBonus.has(swapSlot.norm)) {
             state.bonusPool.set(swapSlot.norm, swapSlot.raw);
             state.mainBonusSet.add(swapSlot.norm);
           }
           swapSlot.raw = rawChars.join('');
           swapSlot.chars = rawChars;
-          swapSlot.norm = bonusHit;
+          swapSlot.norm = norm;
+          state.boardIndex.set(norm, swapSlot);
           solveByPlayer(swapSlot, player);
           return true;
         }
       }
 
-      state.foundBonus.add(bonusHit);
+      state.foundBonus.add(norm);
       const points = Math.round(CFG.bonusPoints * multiplier());
       player.score += points;
       player.words += 1;
       pushFx({ kind: 'bonus_word', chars: rawChars });
-      announce('', `Fjalë bonus nga @${user}! "${raw}" shton +${fmt(points)} PK në renditje`, 'find', 3000);
+      announce('', `Fjalë bonus nga @${user}! "${bonusRaw}" shton +${fmt(points)} PK në renditje`, 'find', 3000);
       refreshKing();
       return true;
     }
 
-    if (Date.now() - state.wrongAt > 2500) {
-      state.wrongAt = Date.now();
-      return maybeAnnounce('', `@${user}, fjala "${shortText(text)}" nuk është në tabelën e këtij raundi`, 'warn');
+    const now = Date.now();
+    if (now - state.wrongAt > 2500) {
+      state.wrongAt = now;
+      return maybeAnnounce('', `@${cleanUser(rawUser)}, fjala "${shortText(text)}" nuk është në tabelën e këtij raundi`, 'warn');
     }
     return false;
   }
@@ -1140,19 +1191,28 @@ function createGameEngine(opts = {}) {
       return;
     }
 
+    let commentNorm = '';
+    if (event.type === 'comment') {
+      commentNorm = event.norm || filterComment(event.text);
+      if (!commentNorm) return;
+    }
+
+    let changed = false;
     if (!event.isSimulated) {
       if (!state.everLive) {
         state.everLive = true;
         if (state.simEnabled) state.simEnabled = false;
       }
-      state.live = true;
+      if (!state.live) {
+        state.live = true;
+        changed = true;
+      }
       state.eventCount += 1;
     }
 
-    let changed = !event.isSimulated;
     switch (event.type) {
       case 'comment':
-        if (handleComment(event.user, event.text, event.team, Boolean(event.isSimulated))) changed = true;
+        if (handleComment(event.user, event.text, event.team, Boolean(event.isSimulated), commentNorm)) changed = true;
         break;
       case 'like':
         if (addLikes(event.count || 1)) changed = true;
@@ -1191,9 +1251,10 @@ function createGameEngine(opts = {}) {
 
   return {
     handleEvent,
+    filterComment,
     getSnapshot,
     destroy
   };
 }
 
-module.exports = { createGameEngine };
+module.exports = { createGameEngine, normalizeGuess };

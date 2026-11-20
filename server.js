@@ -104,6 +104,7 @@ const stats = {
   startedAt: Date.now(),
   events: 0,
   comments: 0,
+  filteredComments: 0,
   likes: 0,
   gifts: 0,
   rejected: 0,
@@ -431,6 +432,16 @@ async function handleEventRequest(req, res) {
       return;
     }
 
+    if (event.type === 'comment') {
+      const norm = gameEngine.filterComment(event.text);
+      if (!norm) {
+        stats.filteredComments += 1;
+        sendJson(res, 200, { ok: true, filtered: true, clients: sseClients.size });
+        return;
+      }
+      event.norm = norm;
+    }
+
     publish(event);
     sendJson(res, 200, { ok: true, clients: sseClients.size, event });
   } catch (err) {
@@ -491,17 +502,6 @@ function extractTikTokUser(data) {
   if (!userId) return null;
   const nickname = String(u?.nickname || data?.nickname || userId).trim() || userId;
   return { userId, nickname };
-}
-
-function mapTikTokChat(data) {
-  const user = extractTikTokUser(data);
-  const text = String(data?.content ?? data?.comment ?? '').trim();
-  if (!text) return null;
-  return {
-    user: user ? user.userId : 'Viewer',
-    nickname: user ? user.nickname : 'Viewer',
-    text
-  };
 }
 
 function mapTikTokLike(data) {
@@ -673,14 +673,22 @@ async function connectTikTokLive(rawUsername, opts = {}) {
 
   conn.on(WebcastEvent.CHAT || 'chat', (data) => {
     if (seq !== tiktokState.connectionSeq) return;
-    const msg = mapTikTokChat(data);
-    if (!msg) return;
+    const rawText = data?.content ?? data?.comment;
+    const norm = gameEngine.filterComment(rawText);
+    if (!norm) {
+      stats.filteredComments += 1;
+      return;
+    }
+    const user = extractTikTokUser(data);
+    const userId = user ? user.userId : 'Viewer';
+    const text = String(rawText).trim();
     publish({
       type: 'comment',
-      user: msg.user,
-      text: msg.text
+      user: userId,
+      text,
+      norm
     });
-    console.log(`[TikTok Chat] @${msg.user}: "${msg.text}"`);
+    console.log(`[TikTok Chat] @${userId}: "${text}"`);
   });
 
   conn.on(WebcastEvent.LIKE || 'like', (data) => {
@@ -908,6 +916,7 @@ const server = http.createServer((req, res) => {
       clients: sseClients.size,
       events: stats.events,
       comments: stats.comments,
+      filteredComments: stats.filteredComments,
       likes: stats.likes,
       gifts: stats.gifts,
       rejected: stats.rejected,
